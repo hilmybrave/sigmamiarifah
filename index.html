@@ -292,6 +292,34 @@ body :is(input,select,textarea)::placeholder{color:#334155;opacity:.9}
  #login-right{padding:4rem 1rem 1.6rem!important}
  #login-frame{padding:0 1.1rem 1.4rem}.lf-crown{width:12rem}
 }
+
+        /* ===== SIGMA v2: performa, frozen pane & sentuh ===== */
+        .matrix-wrapper,#monthly-matrix-container,.overflow-x-auto{-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain}
+        .matrix-table td,.matrix-table th{background-clip:padding-box}
+        .sticky-col-left-1,.sticky-col-left-2,.sticky-col-left-3,#tahfidz-matrix-table .sticky{transform:translateZ(0);-webkit-backface-visibility:hidden;backface-visibility:hidden}
+        .matrix-table td.sticky-col-left-2{background-color:#fff}
+        @media screen{
+          #tahfidz-matrix-table{border-collapse:separate;border-spacing:0;border-left:1px solid #000;border-top:1px solid #000}
+          #tahfidz-matrix-table th,#tahfidz-matrix-table td{border-width:0 1px 1px 0!important;border-color:#000}
+          #tahfidz-matrix-table .sticky{background-color:#fff}
+          #tahfidz-matrix-table thead .sticky{background-color:#f1f5f9}
+          #matrix-body-tahfidz td:nth-child(1),#matrix-header-row-tahfidz th:nth-child(1){width:36px;min-width:36px;max-width:36px;padding-left:0!important;padding-right:0!important;left:0!important}
+          #matrix-body-tahfidz td:nth-child(2),#matrix-header-row-tahfidz th:nth-child(2){left:36px!important;min-width:150px;max-width:200px}
+        }
+        #tahfidz-juz-tabs{scrollbar-width:thin;-webkit-overflow-scrolling:touch}
+        @media (max-width:640px){
+          .sticky-col-left-2{width:112px!important;min-width:112px;max-width:112px;overflow:hidden;text-overflow:ellipsis}
+          .sticky-col-left-3{left:142px!important}
+          #matrix-body-tahfidz td:nth-child(2),#matrix-header-row-tahfidz th:nth-child(2){min-width:110px;max-width:110px}
+        }
+        @media (pointer:coarse),(max-width:768px){
+          .matrix-input{min-height:40px;height:40px}
+          .matrix-table td{min-width:36px}
+          #matrix-body-tahfidz td{height:40px;min-width:38px;font-size:13px}
+          #nilaiRosterContainer button{min-width:44px;min-height:44px}
+          .grade-suite-input-box{width:4.25rem!important;min-height:44px}
+          #modal-bulk-hafalan label.bulk-item{min-height:44px}
+        }
 </style>
 </head>
 <body class="theme-madrasah app-bg min-h-screen text-slate-800 antialiased overflow-x-hidden flex flex-col h-screen">
@@ -601,7 +629,7 @@ body :is(input,select,textarea)::placeholder{color:#334155;opacity:.9}
                         </div>
                         <div class="p-4 bg-slate-50 border-b flex flex-wrap items-center gap-3 text-slate-800">
                             <span class="text-xs font-bold uppercase text-slate-400">Filter Tingkat Kelas:</span>
-                            <select id="filter-siswa-kelas-view" onchange="loadDataSiswa()" class="p-2 border border-slate-200 rounded-xl bg-white text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500 font-bold"><option value="Semua">Semua Kelas Anda</option></select><input type="search" id="search-siswa" oninput="renderSiswaTable()" placeholder="Cari nama siswa..." class="flex-1 min-w-[140px] p-2 border border-slate-200 rounded-xl bg-white text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500 font-bold"><span id="siswa-count" class="text-xs font-extrabold text-emerald-700 bg-emerald-50 border border-emerald-100 px-3 py-1.5 rounded-full">0 siswa</span>
+                            <select id="filter-siswa-kelas-view" onchange="loadDataSiswa()" class="p-2 border border-slate-200 rounded-xl bg-white text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500 font-bold"><option value="Semua">Semua Kelas Anda</option></select><input type="search" id="search-siswa" oninput="debouncedRenderSiswa()" placeholder="Cari nama siswa..." class="flex-1 min-w-[140px] p-2 border border-slate-200 rounded-xl bg-white text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500 font-bold"><span id="siswa-count" class="text-xs font-extrabold text-emerald-700 bg-emerald-50 border border-emerald-100 px-3 py-1.5 rounded-full">0 siswa</span>
                         </div>
                         <div class="overflow-x-auto p-0 sm:p-4">
                             <table class="w-full text-left border-collapse whitespace-nowrap" id="table-siswa">
@@ -611,6 +639,7 @@ body :is(input,select,textarea)::placeholder{color:#334155;opacity:.9}
                                         <th class="p-4 w-12 text-xs font-extrabold uppercase tracking-wider text-slate-500 text-center">No</th><th class="p-4 text-xs font-extrabold uppercase tracking-wider text-slate-500 font-playfair">Nama Siswa</th>
                                         <th class="p-4 text-xs font-extrabold uppercase tracking-wider text-slate-500">Kelas</th>
                                         <th class="p-4 text-xs font-extrabold uppercase tracking-wider text-slate-500">Jenis Kelamin</th>
+                                        <th class="p-4 text-xs font-extrabold uppercase tracking-wider text-slate-500 text-center">Poin Pelanggaran</th>
                                         <th id="th-aksi-siswa" class="p-4 text-xs font-extrabold text-center uppercase tracking-wider text-slate-500">Aksi</th>
                                     </tr>
                                 </thead>
@@ -738,7 +767,7 @@ body :is(input,select,textarea)::placeholder{color:#334155;opacity:.9}
                         <div class="xl:col-span-2 bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden flex flex-col">
                             <div class="p-5 border-b border-slate-100 bg-slate-50/70 flex flex-wrap justify-between items-center gap-3">
                                 <div><h3 class="font-extrabold text-slate-900 text-sm">Kisi Matriks Rekapitulasi Nilai Siswa</h3><p id="nilai-status-info" class="text-xs text-slate-400 mt-0.5">Mode: Data Baru</p></div>
-                                <div class="flex items-center space-x-1.5"><button onclick="bulkSetGradesAction('kkm')" class="bg-white border border-slate-200 text-slate-700 font-bold text-[10px] px-2.5 py-1.5 rounded-lg shadow-sm">Setel KKM (75)</button><button onclick="openPasteExcelModal()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[10px] px-3 py-1.5 rounded-lg shadow-sm flex items-center gap-1"><i class="fas fa-paste"></i> Paste Excel</button></div>
+                                <div class="flex items-center space-x-1.5"><label for="input-kkm" class="text-[10px] font-extrabold text-slate-500 uppercase">KKM</label><input type="number" id="input-kkm" min="0" max="100" value="75" inputmode="numeric" oninput="debouncedKKMChange()" class="w-16 p-1.5 border border-slate-200 rounded-lg text-center font-black text-xs outline-none focus:ring-2 focus:ring-teal-600"><button onclick="bulkSetGradesAction('kkm')" class="bg-white border border-slate-200 text-slate-700 font-bold text-[10px] px-2.5 py-1.5 rounded-lg shadow-sm">Isi Semua = KKM</button><button onclick="openPasteExcelModal()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[10px] px-3 py-1.5 rounded-lg shadow-sm flex items-center gap-1"><i class="fas fa-paste"></i> Paste Excel</button></div>
                             </div>
                             <div class="overflow-x-auto max-h-[450px] custom-scrollbar">
                                 <table class="w-full text-left text-xs border-collapse" id="table-form-nilai">
@@ -791,13 +820,14 @@ body :is(input,select,textarea)::placeholder{color:#334155;opacity:.9}
                                 <div><label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1">Tanggal</label><input type="date" id="rec-kasus-tgl" required class="w-full p-2.5 bg-white border border-slate-200 rounded-xl text-sm"></div>
                                 <div><label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1">Siswa</label><select id="rec-kasus-siswa" required class="w-full p-2.5 bg-white border border-slate-200 rounded-xl text-sm"></select></div>
                                 <div class="md:col-span-2"><label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1">Uraian Kasus</label><input type="text" id="rec-kasus-uraian" required class="w-full p-2.5 bg-white border border-slate-200 rounded-xl text-sm"></div>
+                                <div><label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1">Poin Pelanggaran</label><input type="number" min="0" step="1" value="0" id="rec-kasus-poin" class="w-full p-2.5 bg-white border border-slate-200 rounded-xl text-sm"></div>
                                 <div class="md:col-span-4 flex justify-end gap-2 mt-2"><button type="submit" id="btn-save-kasus" class="px-6 py-2.5 bg-blue-600 text-white rounded-xl text-xs font-bold uppercase shadow-md">Kirim Laporan</button></div>
                             </form>
                         </div>
                         <div id="kasus-analysis" class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5"></div>
                         <div class="overflow-x-auto">
                             <table class="w-full text-left border-collapse whitespace-nowrap" id="table-catatan-kasus">
-                                <thead><tr class="border-b border-slate-100 bg-slate-50/50"><th class="p-4 text-xs font-extrabold uppercase text-slate-500">Tanggal</th><th class="p-4 text-xs font-extrabold uppercase text-slate-500 font-playfair">Siswa</th><th class="p-4 text-xs font-extrabold uppercase text-slate-500">Pelapor</th><th class="p-4 text-xs font-extrabold uppercase text-slate-500">Uraian</th><th class="p-4 text-xs font-extrabold uppercase text-slate-500 text-center">Status</th><th class="p-4 text-xs font-extrabold text-center uppercase text-slate-500 w-32">Aksi</th></tr></thead>
+                                <thead><tr class="border-b border-slate-100 bg-slate-50/50"><th class="p-4 text-xs font-extrabold uppercase text-slate-500">Tanggal</th><th class="p-4 text-xs font-extrabold uppercase text-slate-500 font-playfair">Siswa</th><th class="p-4 text-xs font-extrabold uppercase text-slate-500">Pelapor</th><th class="p-4 text-xs font-extrabold uppercase text-slate-500">Uraian</th><th class="p-4 text-xs font-extrabold uppercase text-slate-500 text-center">Poin</th><th class="p-4 text-xs font-extrabold uppercase text-slate-500 text-center">Status</th><th class="p-4 text-xs font-extrabold text-center uppercase text-slate-500 w-32">Aksi</th></tr></thead>
                                 <tbody class="divide-y divide-slate-50 text-slate-700"></tbody>
                             </table>
                         </div>
@@ -834,10 +864,11 @@ body :is(input,select,textarea)::placeholder{color:#334155;opacity:.9}
                             <div><h3 class="font-black text-slate-800 text-lg tracking-tight">Pencatatan Setoran Hafalan</h3><p class="text-xs text-slate-500 font-medium">Log setoran harian otomatis ke Matriks Kelas.</p></div>
                         </div>
                         
+                        <div id="tahfidz-juz-tabs" class="flex items-center gap-1.5 overflow-x-auto pb-2 mb-3 relative z-10"></div>
                         <form id="form-add-hafalan" onsubmit="addHafalanRecord(event)" class="grid grid-cols-1 md:grid-cols-7 gap-4 text-slate-800 relative z-10">
                             <div><label class="block text-[10px] font-extrabold text-slate-400 uppercase tracking-widest mb-1.5">Tanggal</label><input type="date" id="rec-hafalan-tgl" required class="w-full p-2.5 bg-slate-50 border border-slate-200 outline-none rounded-xl text-sm font-bold"></div>
                             <div class="md:col-span-2"><label class="block text-[10px] font-extrabold text-slate-400 uppercase tracking-widest mb-1.5">Siswa Penyetor</label><select id="rec-hafalan-siswa" required class="w-full p-2.5 bg-slate-50 border border-slate-200 outline-none rounded-xl text-sm font-bold"></select></div>
-                            <div class="md:col-span-2"><label class="block text-[10px] font-extrabold text-slate-400 uppercase tracking-widest mb-1.5">Surah (Otomatis Juz 30)</label><select id="rec-hafalan-surah" required onchange="updateMaxAyatInfo()" class="w-full p-2.5 bg-slate-50 border border-slate-200 outline-none rounded-xl text-sm font-bold"><option value="">Pilih Surah...</option></select></div>
+                            <div class="md:col-span-2"><label class="block text-[10px] font-extrabold text-slate-400 uppercase tracking-widest mb-1.5">Surah (<span id="lbl-juz-aktif">Juz 30</span>)</label><select id="rec-hafalan-surah" required onchange="updateMaxAyatInfo()" class="w-full p-2.5 bg-slate-50 border border-slate-200 outline-none rounded-xl text-sm font-bold"><option value="">Pilih Surah...</option></select></div>
                             <div>
                                 <label class="block text-[10px] font-extrabold text-slate-400 uppercase tracking-widest mb-1.5">Ayat Terakhir</label>
                                 <div class="relative"><input type="number" id="rec-hafalan-ayat" placeholder="Cth: 15" min="1" required class="w-full p-2.5 pr-12 bg-slate-50 border border-slate-200 outline-none rounded-xl text-sm font-black text-slate-700"><span id="max-ayat-info" class="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-bold text-slate-400">/ -</span></div>
@@ -853,6 +884,7 @@ body :is(input,select,textarea)::placeholder{color:#334155;opacity:.9}
                                 <div class="flex items-center gap-3 mt-2"><span class="text-xs font-bold text-slate-500">Filter Kelas:</span><select id="filter-matrix-kelas-tahfidz" onchange="renderTahfidzMatrix()" class="p-1.5 bg-white border border-slate-300 rounded-lg text-xs font-bold text-slate-800 outline-none shadow-sm"></select></div>
                             </div>
                             <div class="flex gap-2">
+                                <button onclick="openBulkHafalan()" class="px-4 py-2 min-h-[40px] bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-black shadow-lg flex items-center gap-2"><i class="fas fa-layer-group"></i> INPUT MASSAL</button>
                                 <button onclick="exportTahfidzMatrixExcel()" class="px-4 py-2 bg-gradient-to-r from-[#0F5132] to-emerald-700 hover:from-[#0F5132] hover:to-emerald-800 text-white rounded-xl text-xs font-black shadow-lg flex items-center gap-2"><i class="fas fa-file-excel text-sm text-emerald-300"></i> EXCEL</button>
                                 <button onclick="exportTahfidzMatrixPDF()" class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-black shadow-lg flex items-center gap-2"><i class="fas fa-file-pdf text-sm text-rose-200"></i> CETAK A4 PDF</button>
                             </div>
@@ -860,7 +892,7 @@ body :is(input,select,textarea)::placeholder{color:#334155;opacity:.9}
 
                         <div class="grid grid-cols-2 md:grid-cols-4 gap-4 p-6 bg-slate-50/30 border-b border-slate-100">
                             <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-4"><div class="w-10 h-10 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center text-lg"><i class="fas fa-users"></i></div><div><p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest">Total Siswa</p><h4 class="text-xl font-black text-slate-800 leading-none" id="kpi-tahfidz-siswa">0</h4></div></div>
-                            <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-4"><div class="w-10 h-10 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center text-lg"><i class="fas fa-list-ol"></i></div><div><p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest">Target Surah</p><h4 class="text-xl font-black text-slate-800 leading-none">38</h4></div></div>
+                            <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-4"><div class="w-10 h-10 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center text-lg"><i class="fas fa-list-ol"></i></div><div><p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest">Target Surah</p><h4 class="text-xl font-black text-slate-800 leading-none" id="kpi-tahfidz-target">38</h4></div></div>
                             <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-4"><div class="w-10 h-10 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center text-lg"><i class="fas fa-award"></i></div><div><p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest">Lulus Target</p><h4 class="text-xl font-black text-emerald-700 leading-none" id="kpi-tahfidz-lulus">0</h4></div></div>
                             <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-4"><div class="w-10 h-10 rounded-full bg-amber-50 text-amber-600 flex items-center justify-center text-lg"><i class="fas fa-chart-line"></i></div><div><p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest">Rata-Rata Capaian</p><h4 class="text-xl font-black text-amber-700 leading-none" id="kpi-tahfidz-avg">0%</h4></div></div>
                         </div>
@@ -883,7 +915,7 @@ body :is(input,select,textarea)::placeholder{color:#334155;opacity:.9}
                                     <thead>
                                         <tr class="bg-slate-100 border-b border-black print:bg-gray-200" style="background-color: #f1f5f9;">
                                             <th colspan="2" class="p-2 border border-black text-center align-middle font-black uppercase bg-arsiran" style="background-image: repeating-linear-gradient(45deg, transparent, transparent 5px, rgba(0,0,0,0.05) 5px, rgba(0,0,0,0.05) 10px);">&nbsp;</th>
-                                            <th colspan="38" class="p-2 border border-black text-center align-middle font-black uppercase text-sm bg-arsiran tracking-widest" style="background-image: repeating-linear-gradient(45deg, transparent, transparent 5px, rgba(0,0,0,0.05) 5px, rgba(0,0,0,0.05) 10px);">NAMA SURAH (JUZ 30)</th>
+                                            <th id="tahfidz-colspan-th" colspan="38" class="p-2 border border-black text-center align-middle font-black uppercase text-sm bg-arsiran tracking-widest" style="background-image: repeating-linear-gradient(45deg, transparent, transparent 5px, rgba(0,0,0,0.05) 5px, rgba(0,0,0,0.05) 10px);">NAMA SURAH (JUZ 30)</th>
                                             <th colspan="4" class="p-2 border border-black text-center align-middle font-black uppercase bg-arsiran" style="background-image: repeating-linear-gradient(45deg, transparent, transparent 5px, rgba(0,0,0,0.05) 5px, rgba(0,0,0,0.05) 10px);">REKAPITULASI CAPAIAN</th>
                                         </tr>
                                         <tr id="matrix-header-row-tahfidz" class="bg-slate-50 border-b border-black">
@@ -942,12 +974,13 @@ body :is(input,select,textarea)::placeholder{color:#334155;opacity:.9}
                             <select id="rec-pendampingan-metode" required class="p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm"><option value="Konseling">Konseling</option><option value="Home Visit">Home Visit</option></select>
                             <input type="text" id="rec-pendampingan-uraian" placeholder="Kasus" required class="p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm md:col-span-2">
                             <input type="text" id="rec-pendampingan-solusi" placeholder="Tindak Lanjut" required class="p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm md:col-span-2">
+                            <div class="md:col-span-4 flex items-center gap-3"><label class="text-[10px] font-extrabold text-slate-400 uppercase" for="rec-pendampingan-poin">Poin Pelanggaran</label><input type="number" min="0" step="1" value="0" id="rec-pendampingan-poin" class="w-28 p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm"></div>
                             <button type="submit" id="btn-save-pendampingan" class="md:col-span-4 btn-primary py-3 rounded-xl font-bold text-xs uppercase shadow">Simpan</button>
                         </form>
                         <div id="pend-analysis" class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5"></div>
                         <div class="overflow-x-auto mt-6">
                             <table class="w-full text-left border-collapse whitespace-nowrap" id="table-pendampingan">
-                                <thead><tr class="border-b bg-slate-50/50"><th class="p-4 text-xs font-extrabold uppercase text-slate-500">Tanggal</th><th class="p-4 text-xs font-extrabold uppercase text-slate-500">Siswa</th><th class="p-4 text-xs font-extrabold uppercase text-slate-500">Jenis</th><th class="p-4 text-xs font-extrabold uppercase text-slate-500">Metode</th><th class="p-4 text-xs font-extrabold uppercase text-slate-500">Kasus</th><th class="p-4 text-xs font-extrabold uppercase text-slate-500">Tindak Lanjut</th><th class="p-4 text-xs font-extrabold text-center uppercase text-slate-500 w-24">Aksi</th></tr></thead>
+                                <thead><tr class="border-b bg-slate-50/50"><th class="p-4 text-xs font-extrabold uppercase text-slate-500">Tanggal</th><th class="p-4 text-xs font-extrabold uppercase text-slate-500">Siswa</th><th class="p-4 text-xs font-extrabold uppercase text-slate-500">Jenis</th><th class="p-4 text-xs font-extrabold uppercase text-slate-500">Metode</th><th class="p-4 text-xs font-extrabold uppercase text-slate-500">Kasus</th><th class="p-4 text-xs font-extrabold uppercase text-slate-500">Tindak Lanjut</th><th class="p-4 text-xs font-extrabold uppercase text-slate-500 text-center">Poin</th><th class="p-4 text-xs font-extrabold text-center uppercase text-slate-500 w-24">Aksi</th></tr></thead>
                                 <tbody class="divide-y text-sm text-slate-700"></tbody>
                             </table>
                         </div>
@@ -1175,6 +1208,12 @@ body :is(input,select,textarea)::placeholder{color:#334155;opacity:.9}
 
     <div id="modal-add-user" class="modal-wrap fixed inset-0 z-50 overflow-y-auto hidden bg-slate-900/60 flex items-center justify-center p-4 backdrop-blur-sm"><div class="bg-white rounded-3xl max-w-md w-full p-6"><h3 class="font-bold border-b pb-4 mb-4">Tambah Akun Guru</h3><form onsubmit="handleManualRegister(event)" class="space-y-4"><div><label class="block text-xs font-bold text-slate-500 mb-1">Nama Lengkap</label><input type="text" id="add-user-nama" required class="w-full p-2.5 border rounded-xl text-sm bg-slate-50 outline-none"></div><div><label class="block text-xs font-bold text-slate-500 mb-1">Username</label><input type="text" id="add-user-username" required class="w-full p-2.5 border rounded-xl text-sm bg-slate-50 outline-none"></div><div><label class="block text-xs font-bold text-slate-500 mb-1">Password</label><input type="password" id="add-user-password" required class="w-full p-2.5 border rounded-xl text-sm bg-slate-50 outline-none"></div><div><label class="block text-xs font-bold text-slate-500 mb-1">Role</label><select id="add-user-role" required class="w-full p-2.5 border rounded-xl text-sm bg-slate-50 outline-none"><option value="wali_kelas">Wali Kelas</option><option value="guru_mapel">Guru Mapel</option><option value="admin">Administrator</option></select></div><div class="flex justify-end gap-2 border-t pt-4"><button type="button" onclick="closeModalAddUser()" class="px-4 py-2 bg-slate-100 rounded-xl text-xs font-bold">Batal</button><button type="submit" class="px-5 py-2 bg-emerald-600 text-white rounded-xl text-xs font-bold">Simpan</button></div></form></div></div>
 
+    <div id="modal-detail-siswa" class="modal-wrap fixed inset-0 z-50 overflow-y-auto hidden bg-slate-900/60 flex items-center justify-center p-4 backdrop-blur-sm"><div class="bg-white rounded-3xl max-w-2xl w-full p-5 sm:p-6 shadow-2xl border"><div class="flex justify-between items-start border-b pb-3 mb-3"><div><h3 id="ds-nama" class="font-extrabold text-base text-slate-800"></h3><p id="ds-info" class="text-xs text-slate-400 mt-0.5"></p></div><button type="button" onclick="closeDetailSiswa()" class="w-10 h-10 rounded-xl bg-slate-100 hover:bg-slate-200 font-black text-slate-500">&times;</button></div><div id="ds-body" class="max-h-[65vh] overflow-y-auto"></div></div></div>
+    <div id="modal-bulk-hafalan" class="modal-wrap fixed inset-0 z-50 overflow-y-auto hidden bg-slate-900/60 flex items-center justify-center p-3 backdrop-blur-sm"><div class="bg-white rounded-3xl max-w-3xl w-full p-5 sm:p-6 shadow-2xl border"><div class="flex justify-between items-center border-b pb-3 mb-3"><h3 class="font-extrabold text-base text-emerald-800"><i class="fas fa-layer-group mr-2"></i>Input Massal Hafalan</h3><button type="button" onclick="closeBulkHafalan()" class="w-10 h-10 rounded-xl bg-slate-100 hover:bg-slate-200 font-black text-slate-500">&times;</button></div>
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-3"><div><label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1">Siswa</label><select id="bulk-hafalan-siswa" onchange="renderBulkSurahList()" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold"></select></div><div><label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1">Juz</label><select id="bulk-hafalan-juz" onchange="renderBulkSurahList()" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold"></select></div><div><label class="block text-[10px] font-extrabold text-slate-400 uppercase mb-1">Tanggal</label><input type="date" id="bulk-hafalan-tgl" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold"></div></div>
+      <div class="flex flex-wrap items-center gap-2 mb-2"><button type="button" onclick="bulkSelectAll(true)" class="px-3 py-2 min-h-[40px] bg-slate-100 rounded-xl text-xs font-bold">Pilih Semua</button><button type="button" onclick="bulkSelectAll(false)" class="px-3 py-2 min-h-[40px] bg-slate-100 rounded-xl text-xs font-bold">Kosongkan</button><span id="bulk-count" class="text-xs font-black text-emerald-700 ml-auto">0 surah dipilih</span></div>
+      <div id="bulk-surah-list" class="grid grid-cols-2 sm:grid-cols-3 gap-2 max-h-[45vh] overflow-y-auto p-1"></div>
+      <div class="flex justify-end gap-2 mt-4"><button type="button" onclick="closeBulkHafalan()" class="px-4 py-2.5 min-h-[44px] bg-slate-100 rounded-xl text-xs font-bold">Batal</button><button type="button" id="btn-save-bulk-hafalan" onclick="saveBulkHafalan()" class="px-5 py-2.5 min-h-[44px] bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-black uppercase"><i class="fas fa-save mr-1"></i> Simpan Sebagai Selesai</button></div></div></div>
     <div id="modal-paste-excel" class="modal-wrap fixed inset-0 z-50 overflow-y-auto hidden bg-slate-900/60 flex items-center justify-center p-4 backdrop-blur-sm"><div class="bg-white rounded-3xl max-w-xl w-full p-6 shadow-2xl border"><h3 class="font-extrabold text-base border-b pb-3 mb-3 text-emerald-800"><i class="fas fa-paste mr-2"></i> Integrator Salin-Tempel (Copy Paste) Excel</h3><p class="text-xs text-slate-500 leading-relaxed mb-4">Salin kolom nilai dari Excel, lalu tempel (*paste*) di bawah ini.</p><textarea id="excel-paste-box" class="w-full p-4 border border-slate-200 rounded-2xl h-44 text-xs font-mono bg-slate-50 custom-scrollbar" placeholder="100&#10;85&#10;90..."></textarea><div class="flex justify-between items-center mt-4"><span class="text-[10px] text-slate-400 font-bold">Baris kosong dilewatkan otomatis.</span><div class="flex gap-2"><button type="button" onclick="closePasteExcelModal()" class="px-4 py-2 bg-slate-100 rounded-xl text-xs font-bold">Batal</button><button type="button" onclick="applyExcelPasteGrades()" class="px-5 py-2 bg-emerald-600 text-white font-bold text-xs rounded-xl">Petakan Nilai</button></div></div></div></div>
 
     <script>
@@ -1194,6 +1233,102 @@ body :is(input,select,textarea)::placeholder{color:#334155;opacity:.9}
         let currentGradesRosterData = [];
         let currentPresensiRosterData = [];
         let activeGradeChartInstance = null;
+
+        // ===== SIGMA v2: util performa =====
+        function debounce(fn, ms = 200) { let t; return function (...a) { clearTimeout(t); t = setTimeout(() => fn.apply(this, a), ms); }; }
+        function setHTMLFast(el, html) { const t = document.createElement('template'); t.innerHTML = html; el.replaceChildren(t.content); }
+        function renderRowsChunked(tbody, rows, onDone, chunk = 40) {
+            const token = (tbody._rt = (tbody._rt || 0) + 1); tbody.replaceChildren(); let i = 0;
+            const step = () => {
+                if (tbody._rt !== token) return;
+                const t = document.createElement('template'); t.innerHTML = rows.slice(i, i + chunk).join('');
+                tbody.appendChild(t.content); i += chunk;
+                if (i < rows.length) requestAnimationFrame(step); else if (onDone) onDone();
+            };
+            if (!rows.length) { if (onDone) onDone(); return; } step();
+        }
+        const debouncedRenderSiswa = debounce(() => renderSiswaTable(), 250);
+        const _mxTimers = {};
+        function scheduleMatrixRow(nis) { clearTimeout(_mxTimers[nis]); _mxTimers[nis] = setTimeout(() => { if (currentMatrixState[nis]) { recalcMatrixRowStats(nis); updateMatrixRowUI(nis); } }, 150); }
+
+        // ===== KKM dinamis =====
+        function getKKM() { const el = document.getElementById('input-kkm'); let v = el ? parseInt(el.value) : 75; if (isNaN(v)) v = 75; return Math.min(100, Math.max(0, v)); }
+        function getPredikat(score) { if (score < getKKM()) return 'D'; if (score >= 90) return 'A'; if (score >= 80) return 'B'; return 'C'; }
+        function applyGradeRowState(nis, val) {
+            const box = document.getElementById(`num-${nis}`), kkmLabel = document.getElementById(`kkm-${nis}`), pr = document.getElementById(`predikat-${nis}`); if (!box || !kkmLabel || !pr) return;
+            const isTuntas = val >= getKKM();
+            box.className = `grade-suite-input-box w-14 border rounded-xl py-1 text-center font-black text-xs outline-none shadow-sm ${isTuntas ? 'grade-input-passing' : 'grade-input-remedial'}`;
+            kkmLabel.className = `inline-block px-2.5 py-0.5 rounded-full text-[9px] font-black ${isTuntas ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'}`;
+            kkmLabel.innerText = isTuntas ? 'TUNTAS' : 'REMEDIAL'; pr.innerText = getPredikat(val);
+        }
+        const debouncedGradeMetrics = debounce(() => computeLiveGradeSuiteAnalyticsMetrics(), 150);
+        function onKKMChange() { currentGradesRosterData.forEach(r => { r.KKM = getKKM(); applyGradeRowState(r.NISSiswa, r.Nilai); }); computeLiveGradeSuiteAnalyticsMetrics(); }
+        const debouncedKKMChange = debounce(onKKMChange, 200);
+
+        // ===== Poin pelanggaran =====
+        function poinStatus(t) {
+            t = parseInt(t) || 0;
+            if (t <= 0) return { label: 'Bersih', cls: 'bg-slate-100 text-slate-500' };
+            if (t <= 5) return { label: 'Ringan', cls: 'bg-emerald-100 text-emerald-700' };
+            if (t <= 10) return { label: 'Ringan', cls: 'bg-yellow-100 text-yellow-800' };
+            if (t <= 25) return { label: 'Sedang', cls: 'bg-orange-100 text-orange-700' };
+            return { label: 'Berat / SP', cls: 'bg-red-100 text-red-700' };
+        }
+        function poinBadge(t) { t = parseInt(t) || 0; const st = poinStatus(t); return `<span class="inline-block px-2 py-0.5 rounded-full text-[10px] font-black whitespace-nowrap ${st.cls}">${t} Poin &middot; ${st.label}</span>`; }
+        function canEditPoin() { return !!currentUser && (currentUser.role === 'admin' || currentUser.role === 'wali_kelas'); }
+        // Catatan: laporan kasus otomatis membuat salinan di Pendampingan (KasusID). Agar tidak dobel, kasus yang sudah punya salinan tidak dihitung lagi.
+        function computePoinTotals(pend, kasus) {
+            const m = {}, linked = new Set();
+            (pend || []).forEach(p => { m[p.NISSiswa] = (m[p.NISSiswa] || 0) + (parseInt(p.PoinPelanggaran) || 0); if (p.KasusID) linked.add(String(p.KasusID)); });
+            (kasus || []).forEach(k => { if (!linked.has(String(k.ID))) m[k.NISSiswa] = (m[k.NISSiswa] || 0) + (parseInt(k.PoinPelanggaran) || 0); });
+            return m;
+        }
+        async function loadPoinMap(force) {
+            if (window._poinMap && !force) return window._poinMap;
+            try {
+                const [p, k] = await Promise.all([server.run('readData', 'Pendampingan'), server.run('readData', 'CatatanKasus')]);
+                window._poinPend = p; window._poinKasus = k; window._poinMap = computePoinTotals(p, k);
+            } catch (e) { window._poinMap = window._poinMap || {}; }
+            return window._poinMap;
+        }
+        function poinCell(table, d) {
+            const n = parseInt(d.PoinPelanggaran) || 0;
+            return (n > 0 ? `<span class="font-black text-rose-600">${n}</span>` : '<span class="text-slate-300">0</span>') + (canEditPoin() ? ` <button type="button" onclick="editPoinPelanggaran('${table}','${escapeHTML(d.ID)}')" title="Sesuaikan poin" class="ml-1 text-indigo-600 hover:text-indigo-800 min-w-[32px] min-h-[32px]"><i class="fas fa-pen"></i></button>` : '');
+        }
+        async function editPoinPelanggaran(table, id, ctx) {
+            if (!canEditPoin()) return Swal.fire('Akses ditolak', 'Hanya Wali Kelas atau Administrator yang dapat mengubah poin.', 'warning');
+            const src = table === 'Pendampingan' ? (window._pendCache || window._poinPend || []) : (window._kasusCache || window._poinKasus || []);
+            const d = src.find(x => String(x.ID) === String(id)) || ((table === 'Pendampingan' ? window._poinPend : window._poinKasus) || []).find(x => String(x.ID) === String(id)); if (!d) return;
+            const r = await Swal.fire({ title: 'Sesuaikan Poin Pelanggaran', input: 'number', inputValue: parseInt(d.PoinPelanggaran) || 0, inputAttributes: { min: 0, step: 1 }, showCancelButton: true, confirmButtonText: 'Simpan', cancelButtonText: 'Batal', inputValidator: v => (v === '' || isNaN(v) || +v < 0) ? 'Isi angka 0 atau lebih.' : undefined });
+            if (!r.isConfirmed) return; const poin = Math.max(0, parseInt(r.value) || 0);
+            showLoader();
+            try {
+                await server.run('updateData', table, id, { PoinPelanggaran: poin });
+                if (table === 'Pendampingan' && d.KasusID) await server.run('updateData', 'CatatanKasus', d.KasusID, { PoinPelanggaran: poin });
+                if (table === 'CatatanKasus') { const lk = (await server.run('readData', 'Pendampingan')).filter(p => String(p.KasusID) === String(id)); for (const p of lk) await server.run('updateData', 'Pendampingan', p.ID, { PoinPelanggaran: poin }); }
+                window._poinMap = null; toast.fire({ icon: 'success', title: 'Poin diperbarui' });
+                hideLoader();
+                if (ctx === 'detail') { await loadPoinMap(true); renderSiswaTable(); if (window._detailSiswaId) openDetailSiswa(window._detailSiswaId); }
+                else if (table === 'Pendampingan') await loadDataPendampingan(); else await loadDataCatatanKasus();
+            } catch (e) {}
+            hideLoader();
+        }
+        async function openDetailSiswa(id) {
+            const sw = (window._siswaCache || []).find(x => String(x.ID) === String(id)); if (!sw) return;
+            window._detailSiswaId = id; await loadPoinMap(); const nis = String(sw.NIS);
+            const ents = [];
+            (window._poinPend || []).filter(p => String(p.NISSiswa) === nis).forEach(p => ents.push({ t: 'Pendampingan', d: p }));
+            const linked = new Set((window._poinPend || []).filter(p => p.KasusID).map(p => String(p.KasusID)));
+            (window._poinKasus || []).filter(k => String(k.NISSiswa) === nis && !linked.has(String(k.ID))).forEach(k => ents.push({ t: 'CatatanKasus', d: k }));
+            ents.sort((a, b) => String(b.d.Tanggal).localeCompare(String(a.d.Tanggal)));
+            const total = (window._poinMap || {})[sw.NIS] || 0;
+            document.getElementById('ds-nama').innerText = sw.Nama; document.getElementById('ds-info').innerText = `Kelas ${sw.Kelas} \u2022 ${sw.JenisKelamin === 'L' ? 'Laki-laki' : 'Perempuan'}`;
+            document.getElementById('ds-body').innerHTML = `<div class="flex flex-wrap items-center gap-3 bg-slate-50 border rounded-2xl p-3 mb-3"><div><div class="text-[10px] font-extrabold text-slate-400 uppercase">Total Poin Pelanggaran</div><div class="text-2xl font-black text-slate-800 leading-none mt-1">${total}</div></div>${poinBadge(total)}<div class="text-[10px] text-slate-400 ml-auto">1\u201310 Ringan \u2022 11\u201325 Sedang \u2022 &gt;25 Berat/SP</div></div>` +
+                (ents.length ? `<div class="overflow-x-auto"><table class="w-full text-xs border-collapse whitespace-nowrap"><thead><tr class="bg-slate-100 text-left"><th class="p-2">Tanggal</th><th class="p-2">Sumber</th><th class="p-2">Uraian</th><th class="p-2 text-center">Poin</th></tr></thead><tbody>${ents.map(e => `<tr class="border-b"><td class="p-2 font-bold">${escapeHTML(String(e.d.Tanggal).slice(0, 10))}</td><td class="p-2">${e.t === 'Pendampingan' ? escapeHTML(e.d.Jenis || 'Pendampingan') : 'Laporan Kasus'}</td><td class="p-2 whitespace-normal min-w-[160px]">${escapeHTML(e.d.Uraian || '')}</td><td class="p-2 text-center">${poinCell(e.t, e.d).replace(/editPoinPelanggaran\('(\w+)','([^']*)'\)/, "editPoinPelanggaran('$1','$2','detail')")}</td></tr>`).join('')}</tbody></table></div>` : '<p class="text-center text-slate-400 text-sm py-6">Belum ada catatan pendampingan/kasus.</p>');
+            document.getElementById('modal-detail-siswa').classList.remove('hidden');
+        }
+        function closeDetailSiswa() { document.getElementById('modal-detail-siswa').classList.add('hidden'); window._detailSiswaId = null; }
+
         let uploadedLogoBase64 = null;
         
         // --- MATRIX PRESENSI STATE ---
@@ -1219,6 +1354,28 @@ body :is(input,select,textarea)::placeholder{color:#334155;opacity:.9}
             { name: "AL BURUJ", ayahs: 22 }, { name: "AL INSYIQAQ", ayahs: 25 }, { name: "AL MUTAFFIFIN", ayahs: 36 }, { name: "AL INFITAR", ayahs: 19 }, { name: "AT TAQWIR", ayahs: 29 }, { name: "ABASA", ayahs: 42 }, 
             { name: "AN NAZI'AT", ayahs: 46 }, { name: "AN NABA'", ayahs: 40 }
         ];
+
+        
+        // ===== Dataset Juz 1-30 =====
+        const SURAH_NAMES = ["AL FATIHAH","AL BAQARAH","ALI IMRAN","AN NISA'","AL MA'IDAH","AL AN'AM","AL A'RAF","AL ANFAL","AT TAUBAH","YUNUS","HUD","YUSUF","AR RA'D","IBRAHIM","AL HIJR","AN NAHL","AL ISRA'","AL KAHFI","MARYAM","THAHA","AL ANBIYA'","AL HAJJ","AL MU'MINUN","AN NUR","AL FURQAN","ASY SYU'ARA'","AN NAML","AL QASHASH","AL 'ANKABUT","AR RUM","LUQMAN","AS SAJDAH","AL AHZAB","SABA'","FATHIR","YASIN","ASH SHAFFAT","SHAD","AZ ZUMAR","GHAFIR","FUSHSHILAT","ASY SYURA","AZ ZUKHRUF","AD DUKHAN","AL JATSIYAH","AL AHQAF","MUHAMMAD","AL FATH","AL HUJURAT","QAF","ADZ DZARIYAT","ATH THUR","AN NAJM","AL QAMAR","AR RAHMAN","AL WAQI'AH","AL HADID","AL MUJADILAH","AL HASYR","AL MUMTAHANAH","ASH SHAFF","AL JUMU'AH","AL MUNAFIQUN","AT TAGHABUN","ATH THALAQ","AT TAHRIM","AL MULK","AL QALAM","AL HAQQAH","AL MA'ARIJ","NUH","AL JINN","AL MUZZAMMIL","AL MUDDATSTSIR","AL QIYAMAH","AL INSAN","AL MURSALAT","AN NABA'","AN NAZI'AT","ABASA","AT TAQWIR","AL INFITAR","AL MUTAFFIFIN","AL INSYIQAQ","AL BURUJ","AT TARIQ","AL A'LA","AL GHASYIYAH","AL FAJR","AL BALAD","ASY SYAMS","AL LAIL","AD DUHA","AL INSYIRAH","AT TIN","AL 'ALAQ","AL QADAR","AL BAYYINAH","AZ ZALZALAH","AL 'ADIYAT","AL QARIAH","AT TAKASUR","AL 'ASR","AL HUMAZAH","AL FIL","AL QURAISY","AL MAUN","AL KAUSAR","AL KAFIRUN","AN NASR","AL LAHAB","AL IKHLAS","AL FALAQ","AN NASS"];
+        const SURAH_AYAT = [7,286,200,176,120,165,206,75,129,109,123,111,43,52,99,128,111,110,98,135,112,78,118,64,77,227,93,88,69,60,34,30,73,54,45,83,182,88,75,85,54,53,89,59,37,35,38,29,18,45,60,49,62,55,78,96,29,22,24,13,14,11,11,18,12,12,30,52,52,44,28,28,20,56,40,31,50,40,46,42,29,19,36,25,22,17,19,26,30,20,15,21,11,8,8,19,5,8,8,11,11,8,3,9,5,4,7,3,6,3,5,4,5,6];
+        const JUZ_START = [[1,1],[2,142],[2,253],[3,93],[4,24],[4,148],[5,82],[6,111],[7,88],[8,41],[9,93],[11,6],[12,53],[15,1],[17,1],[18,75],[21,1],[23,1],[25,21],[27,56],[29,46],[33,31],[36,28],[39,32],[41,47],[46,1],[51,31],[58,1],[67,1],[78,1]];
+        const JUZ_DATA = (function () {
+            const out = {};
+            for (let j = 1; j <= 30; j++) {
+                const st = JUZ_START[j - 1]; let end;
+                if (j === 30) end = [114, 6]; else { const nx = JUZ_START[j]; end = nx[1] === 1 ? [nx[0] - 1, SURAH_AYAT[nx[0] - 2]] : [nx[0], nx[1] - 1]; }
+                const list = [];
+                for (let n = st[0]; n <= end[0]; n++) { const from = n === st[0] ? st[1] : 1, to = n === end[0] ? end[1] : SURAH_AYAT[n - 1]; list.push({ name: SURAH_NAMES[n - 1], no: n, from, to, ayahs: to - from + 1 }); }
+                out[j] = list;
+            }
+            // Juz 30 mempertahankan susunan lama (Al Fatihah + An Nass s.d. An Naba') agar data & capaian lama tetap valid
+            out[30] = JUZ30_REVERSE.map(x => ({ name: x.name, no: SURAH_NAMES.indexOf(x.name) + 1, from: 1, to: x.ayahs, ayahs: x.ayahs }));
+            return out;
+        })();
+        let activeJuz = 30, _tahfidzRenderToken = 0;
+        const isPartialSurah = x => x.no > 0 && (x.from > 1 || x.to < SURAH_AYAT[x.no - 1]);
+        const surahRangeLabel = x => isPartialSurah(x) ? `${x.from}\u2013${x.to}` : `${x.ayahs} ayat`;
 
         // ===== Klien API Google Apps Script (REST via fetch; tanpa layanan pihak ketiga) =====
         // GET: query string. POST/PUT/DELETE: POST text/plain + {_method} (GAS hanya punya doGet/doPost & tidak menjawab preflight CORS).
@@ -1399,7 +1556,7 @@ body :is(input,select,textarea)::placeholder{color:#334155;opacity:.9}
                 const data = (await server.run('readData', 'Siswa')).filter(s => allowed.includes(s.Kelas));
                 data.sort((a, b) => String(a.Kelas).localeCompare(String(b.Kelas), 'id', { numeric: true }) || Number(a.Timestamp || 0) - Number(b.Timestamp || 0));
                 window._siswaCache = data;
-                renderSiswaTable();
+                renderSiswaTable(); loadPoinMap(true).then(renderSiswaTable);
             } catch (e) {}
             hideLoader();
         }
@@ -1407,9 +1564,9 @@ body :is(input,select,textarea)::placeholder{color:#334155;opacity:.9}
             const cls = document.getElementById('filter-siswa-kelas-view').value || 'Semua';
             const q = (document.getElementById('search-siswa') ? document.getElementById('search-siswa').value : '').trim().toLowerCase();
             const data = (window._siswaCache || []).filter(s => (cls === 'Semua' || s.Kelas === cls) && (!q || String(s.Nama).toLowerCase().indexOf(q) !== -1));
-            const canEdit = !!currentUser && (currentUser.role === 'admin' || currentUser.role === 'wali_kelas');
+            const canEdit = !!currentUser && (currentUser.role === 'admin' || currentUser.role === 'wali_kelas'); const poinMap = window._poinMap || {};
             const tbody = document.querySelector('#table-siswa tbody');
-            tbody.innerHTML = data.map((s, i) => `<tr class="hover:bg-slate-50 transition border-b"><td class="p-4 text-center text-slate-400 font-bold">${i + 1}</td><td class="p-4 font-bold text-slate-800">${escapeHTML(s.Nama)}</td><td class="p-4"><span class="px-2.5 py-0.5 bg-emerald-50 text-emerald-800 font-bold text-xs rounded-full">Kelas ${escapeHTML(s.Kelas)}</span></td><td class="p-4">${s.JenisKelamin === 'L' ? 'Laki-laki (L)' : 'Perempuan (P)'}</td><td class="p-4"><div class="flex items-center justify-center gap-2">${canEdit ? `<button onclick="openEditSiswaModal('${escapeHTML(s.ID)}')" class="text-xs bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-3 py-1.5 rounded-xl transition shadow-sm">Edit</button><button onclick="deleteRowData('Siswa', '${escapeHTML(s.ID)}')" class="text-xs bg-red-500 hover:bg-red-600 text-white font-bold px-3 py-1.5 rounded-xl transition shadow-sm"><i class="fas fa-trash-alt"></i></button>` : '<span class="text-xs text-slate-400 font-bold">Baca saja</span>'}</div></td></tr>`).join('') || '<tr><td colspan="5" class="p-8 text-center text-slate-400 text-sm">Belum ada data siswa.</td></tr>';
+            tbody.innerHTML = data.map((s, i) => `<tr class="hover:bg-slate-50 transition border-b"><td class="p-4 text-center text-slate-400 font-bold">${i + 1}</td><td class="p-4 font-bold text-slate-800">${escapeHTML(s.Nama)}</td><td class="p-4"><span class="px-2.5 py-0.5 bg-emerald-50 text-emerald-800 font-bold text-xs rounded-full">Kelas ${escapeHTML(s.Kelas)}</span></td><td class="p-4">${s.JenisKelamin === 'L' ? 'Laki-laki (L)' : 'Perempuan (P)'}</td><td class="p-4 text-center">${poinBadge(poinMap[s.NIS] || 0)}</td><td class="p-4"><div class="flex items-center justify-center gap-2"><button onclick="openDetailSiswa('${escapeHTML(s.ID)}')" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-3 py-1.5 min-h-[36px] rounded-xl transition shadow-sm">Detail</button>${canEdit ? `<button onclick="openEditSiswaModal('${escapeHTML(s.ID)}')" class="text-xs bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-3 py-1.5 rounded-xl transition shadow-sm">Edit</button><button onclick="deleteRowData('Siswa', '${escapeHTML(s.ID)}')" class="text-xs bg-red-500 hover:bg-red-600 text-white font-bold px-3 py-1.5 rounded-xl transition shadow-sm"><i class="fas fa-trash-alt"></i></button>` : '<span class="text-xs text-slate-400 font-bold">Baca saja</span>'}</div></td></tr>`).join('') || '<tr><td colspan="6" class="p-8 text-center text-slate-400 text-sm">Belum ada data siswa.</td></tr>';
             const c = document.getElementById('siswa-count'); if (c) c.innerText = data.length + ' siswa';
         }
 
@@ -1573,10 +1730,10 @@ body :is(input,select,textarea)::placeholder{color:#334155;opacity:.9}
                     info = [`Jumlah jurnal: ${d.length}`, `Rata-rata ketercapaian: ${avg(d.map(x => +x.Ketercapaian)) || '-'}%`];
                 } else {
                     const isP = t === 'Pendampingan';
-                    list = { head: isP ? ['Tanggal', 'Siswa', 'Kelas', 'Jenis', 'Metode', 'Kasus', 'Tindak Lanjut'] : ['Tanggal', 'Siswa', 'Kelas', 'Pelapor', 'Uraian', 'Status'], rows: d.map(x => { const s = nm[x.NISSiswa]; return isP ? [String(x.Tanggal).slice(0, 10), s.Nama, s.Kelas, x.Jenis, x.Metode, x.Uraian, x.Solusi] : [String(x.Tanggal).slice(0, 10), s.Nama, s.Kelas, x.Pelapor, x.Uraian, x.Status]; }) };
-                    const ids = [...new Set(d.map(x => x.NISSiswa))]; mat = { head: ['Siswa', ...days, 'Jml'], rows: ids.map(id => { const c = days.map(i => d.filter(x => x.NISSiswa === id && day(x) === i).length); return [nm[id].Nama, ...c.map(v => v || ''), c.reduce((p, q) => p + q, 0)]; }) };
+                    list = { head: isP ? ['Tanggal', 'Siswa', 'Kelas', 'Jenis', 'Metode', 'Kasus', 'Tindak Lanjut', 'Poin'] : ['Tanggal', 'Siswa', 'Kelas', 'Pelapor', 'Uraian', 'Status', 'Poin'], rows: d.map(x => { const s = nm[x.NISSiswa]; return isP ? [String(x.Tanggal).slice(0, 10), s.Nama, s.Kelas, x.Jenis, x.Metode, x.Uraian, x.Solusi, x.PoinPelanggaran || 0] : [String(x.Tanggal).slice(0, 10), s.Nama, s.Kelas, x.Pelapor, x.Uraian, x.Status, x.PoinPelanggaran || 0]; }) };
+                    const ids = [...new Set(d.map(x => x.NISSiswa))]; mat = { head: ['Siswa', ...days, 'Jml', 'Poin'], rows: ids.map(id => { const c = days.map(i => d.filter(x => x.NISSiswa === id && day(x) === i).length); return [nm[id].Nama, ...c.map(v => v || ''), c.reduce((p, q) => p + q, 0), d.filter(x => x.NISSiswa === id).reduce((p, x) => p + (parseInt(x.PoinPelanggaran) || 0), 0)]; }) };
                     const top = ids.map(id => [nm[id].Nama, d.filter(x => x.NISSiswa === id).length]).sort((a, b) => b[1] - a[1]).slice(0, 3);
-                    info = [`Jumlah catatan: ${d.length} | Siswa terlibat: ${ids.length}`]; if (top.length) info.push('Paling sering: ' + top.map(x => `${x[0]} (${x[1]})`).join(', '));
+                    info = [`Jumlah catatan: ${d.length} | Siswa terlibat: ${ids.length}`]; info.push('Total poin pelanggaran: ' + d.reduce((p, x) => p + (parseInt(x.PoinPelanggaran) || 0), 0)); if (top.length) info.push('Paling sering: ' + top.map(x => `${x[0]} (${x[1]})`).join(', '));
                     if (isP) { const j = {}; d.forEach(x => j[x.Jenis] = (j[x.Jenis] || 0) + 1); info.push('Per jenis: ' + (Object.entries(j).map(([k, v]) => `${k} ${v}`).join(', ') || '-')); const lk = d.filter(x => x.Sumber === 'Laporan Kasus').length; info.push(`Berasal dari Laporan Kasus: ${lk}`); }
                 }
                 _rk.out = { list, mat, title: `${RK_TITLE[t]} ${bln}${fk !== 'Semua' ? ' Kelas ' + fk : ''}`, info };
@@ -1818,7 +1975,7 @@ body :is(input,select,textarea)::placeholder{color:#334155;opacity:.9}
                 });
 
                 html += `</tbody></table>`;
-                document.getElementById('monthly-matrix-container').innerHTML = html;
+                setHTMLFast(document.getElementById('monthly-matrix-container'), html);
 
             } catch (err) { console.error(err); Swal.fire('Error', 'Gagal memuat data matrix.', 'error'); }
             
@@ -1865,7 +2022,7 @@ body :is(input,select,textarea)::placeholder{color:#334155;opacity:.9}
             inputEl.className = 'matrix-input'; 
             if (val) inputEl.classList.add(`val-${val.toLowerCase()}`);
             currentMatrixState[nis].data[day] = val;
-            recalcMatrixRowStats(nis); updateMatrixRowUI(nis);
+            scheduleMatrixRow(nis);
         }
 
         function recalcMatrixRowStats(nis) {
@@ -1947,35 +2104,36 @@ body :is(input,select,textarea)::placeholder{color:#334155;opacity:.9}
                 const existingGrades = (await server.run('readData', 'Nilai')).filter(g => g.Kelas === cls && g.Mapel === mapel && g.JenisPenilaian === jenis);
                 const statusNode = document.getElementById('nilai-status-info'); statusNode.innerText = existingGrades.length > 0 ? `Mode Koreksi` : "Mode Baru";
                 const container = document.getElementById('nilaiRosterContainer'); container.innerHTML = ""; currentGradesRosterData = [];
+                const savedK = existingGrades.find(g => g.KKM !== undefined && g.KKM !== null && String(g.KKM) !== ''); if (savedK) document.getElementById('input-kkm').value = Math.min(100, Math.max(0, parseInt(savedK.KKM) || 75));
+                const kkmNow = getKKM(), rowsHtml = [];
 
                 if (matchedSiswa.length === 0) { container.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-slate-400">Kosong!</td></tr>`; document.getElementById('container-form-nilai').classList.remove('hidden'); hideLoader(); return; }
                 matchedSiswa.forEach((s, idx) => {
                     const gradeLog = existingGrades.find(g => String(g.NISSiswa) === String(s.NIS)); const scoreVal = gradeLog ? parseInt(gradeLog.Nilai) || 0 : 0; const logId = gradeLog ? gradeLog.ID : `n_${Date.now()}_${idx}`;
-                    currentGradesRosterData.push({ ID: logId, Tanggal: gradeLog ? gradeLog.Tanggal : localISO(), Kelas: cls, Mapel: mapel, JenisPenilaian: jenis, NISSiswa: s.NIS, Nilai: scoreVal });
-                    const isTuntas = scoreVal >= 75;
-                    container.innerHTML += `<tr class="hover:bg-slate-50 transition border-b"><td class="p-3 pl-5 text-center text-slate-400 font-bold">${idx + 1}</td><td class="p-3 font-extrabold">${escapeHTML(s.Nama)}</td><td class="p-3 text-center"><div class="flex items-center justify-center space-x-1"><button type="button" onclick="adjustGrade('${s.NIS}', -5)" class="h-7 w-7 bg-slate-100 hover:bg-slate-200 border rounded-lg">-5</button><input type="range" min="0" max="100" value="${scoreVal}" id="sld-${s.NIS}" oninput="syncBidirectionalGradesControl('${s.NIS}', 'slider')" class="hidden sm:block w-32 h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-teal-700 outline-none"><input type="text" id="num-${s.NIS}" inputmode="numeric" oninput="syncBidirectionalGradesControl('${s.NIS}', 'box')" class="grade-suite-input-box ${isTuntas ? 'grade-input-passing' : 'grade-input-remedial'} w-14 bg-slate-50 border rounded-xl py-1 text-center font-black text-xs outline-none shadow-sm" value="${scoreVal}"><button type="button" onclick="adjustGrade('${s.NIS}', 5)" class="h-7 w-7 bg-slate-100 border rounded-lg">+5</button></div></td><td class="p-3 text-center font-extrabold text-sm" id="predikat-${s.NIS}">${getPredikat(scoreVal)}</td><td class="p-3 text-center"><span id="kkm-${s.NIS}" class="inline-block px-2.5 py-0.5 rounded-full text-[9px] font-black ${isTuntas ? 'bg-emerald-100 text-emerald-700':'bg-rose-100 text-rose-700'}">${isTuntas ? 'TUNTAS':'REMEDIAL'}</span></td></tr>`;
+                    currentGradesRosterData.push({ ID: logId, Tanggal: gradeLog ? gradeLog.Tanggal : localISO(), Kelas: cls, Mapel: mapel, JenisPenilaian: jenis, NISSiswa: s.NIS, Nilai: scoreVal, KKM: kkmNow });
+                    const isTuntas = scoreVal >= kkmNow;
+                    rowsHtml.push(`<tr class="hover:bg-slate-50 transition border-b"><td class="p-3 pl-5 text-center text-slate-400 font-bold">${idx + 1}</td><td class="p-3 font-extrabold">${escapeHTML(s.Nama)}</td><td class="p-3 text-center"><div class="flex items-center justify-center space-x-1"><button type="button" onclick="adjustGrade('${s.NIS}', -5)" class="h-7 w-7 bg-slate-100 hover:bg-slate-200 border rounded-lg">-5</button><input type="range" min="0" max="100" value="${scoreVal}" id="sld-${s.NIS}" oninput="syncBidirectionalGradesControl('${s.NIS}', 'slider')" class="hidden sm:block w-32 h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-teal-700 outline-none"><input type="text" id="num-${s.NIS}" inputmode="numeric" oninput="syncBidirectionalGradesControl('${s.NIS}', 'box')" class="grade-suite-input-box ${isTuntas ? 'grade-input-passing' : 'grade-input-remedial'} w-14 bg-slate-50 border rounded-xl py-1 text-center font-black text-xs outline-none shadow-sm" value="${scoreVal}"><button type="button" onclick="adjustGrade('${s.NIS}', 5)" class="h-7 w-7 bg-slate-100 border rounded-lg">+5</button></div></td><td class="p-3 text-center font-extrabold text-sm" id="predikat-${s.NIS}">${getPredikat(scoreVal)}</td><td class="p-3 text-center"><span id="kkm-${s.NIS}" class="inline-block px-2.5 py-0.5 rounded-full text-[9px] font-black ${isTuntas ? 'bg-emerald-100 text-emerald-700':'bg-rose-100 text-rose-700'}">${isTuntas ? 'TUNTAS':'REMEDIAL'}</span></td></tr>`);
                 });
-                bindGradeSuiteVerticalKeyboardCycler(); computeLiveGradeSuiteAnalyticsMetrics(); document.getElementById('container-form-nilai').classList.remove('hidden');
+                computeLiveGradeSuiteAnalyticsMetrics(); document.getElementById('container-form-nilai').classList.remove('hidden');
+                renderRowsChunked(container, rowsHtml, bindGradeSuiteVerticalKeyboardCycler, 40);
             } catch(e) {} hideLoader();
         }
 
         function adjustGrade(nis, amount) { const box = document.getElementById(`num-${nis}`); if (!box) return; let val = parseInt(box.value) || 0; val += amount; if (val > 100) val = 100; if (val < 0) val = 0; box.value = val; syncBidirectionalGradesControl(nis, 'box'); }
-        function getPredikat(score) { if (score >= 90) return 'A'; if (score >= 80) return 'B'; if (score >= 75) return 'C'; return 'D'; }
         function syncBidirectionalGradesControl(nis, triggerKey) {
-            const slider = document.getElementById(`sld-${nis}`), box = document.getElementById(`num-${nis}`), kkmLabel = document.getElementById(`kkm-${nis}`), predikatLabel = document.getElementById(`predikat-${nis}`);
-            let val = triggerKey === 'slider' ? parseInt(slider.value) : parseInt(box.value) || 0; if (val > 100) val = 100; if (val < 0) val = 0; if(triggerKey==='box') slider.value = val;
+            const slider = document.getElementById(`sld-${nis}`), box = document.getElementById(`num-${nis}`); if (!slider || !box) return;
+            let val = triggerKey === 'slider' ? parseInt(slider.value) : parseInt(box.value) || 0; if (val > 100) val = 100; if (val < 0) val = 0; if (triggerKey === 'box') slider.value = val;
             const match = currentGradesRosterData.find(x => String(x.NISSiswa) === String(nis)); if (match) match.Nilai = val;
-            const isTuntas = val >= 75; box.className = `grade-suite-input-box w-14 border rounded-xl py-1 text-center font-black text-xs outline-none shadow-sm ${isTuntas ? 'grade-input-passing' : 'grade-input-remedial'}`;
-            kkmLabel.className = `inline-block px-2.5 py-0.5 rounded-full text-[9px] font-black ${isTuntas ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'}`; kkmLabel.innerText = isTuntas ? 'TUNTAS' : 'REMEDIAL'; predikatLabel.innerText = getPredikat(val); computeLiveGradeSuiteAnalyticsMetrics();
+            applyGradeRowState(nis, val); debouncedGradeMetrics();
         }
         function bindGradeSuiteVerticalKeyboardCycler() { const inputs = document.querySelectorAll('.grade-suite-input-box'); inputs.forEach((input, index) => { input.addEventListener('keydown', function(e) { if (e.key === 'Enter' || e.key === 'ArrowDown') { e.preventDefault(); if (index < inputs.length - 1) inputs[index + 1].focus(); } else if (e.key === 'ArrowUp') { e.preventDefault(); if (index > 0) inputs[index - 1].focus(); } }); }); }
-        function bulkSetGradesAction(actionType) { const targetVal = actionType === 'kkm' ? 75 : 0; currentGradesRosterData.forEach(s => { const box = document.getElementById(`num-${s.NISSiswa}`); if (box) { box.value = targetVal; syncBidirectionalGradesControl(s.NISSiswa, 'box'); } }); }
-        
+        function bulkSetGradesAction(actionType) { const targetVal = actionType === 'kkm' ? getKKM() : 0; currentGradesRosterData.forEach(s => { const box = document.getElementById(`num-${s.NISSiswa}`); if (box) { box.value = targetVal; syncBidirectionalGradesControl(s.NISSiswa, 'box'); } }); }
+
         function computeLiveGradeSuiteAnalyticsMetrics() {
-            if (currentGradesRosterData.length === 0) return; const scores = currentGradesRosterData.map(x => x.Nilai); const sum = scores.reduce((a, b) => a + b, 0); const avg = (sum / scores.length).toFixed(1); const passRate = Math.round((scores.filter(s => s >= 75).length / scores.length) * 100);
-            document.getElementById('stat-rata').innerText = avg; document.getElementById('stat-passing-rate-badge').innerText = `${passRate}%`; 
-            const predCounts = { A: scores.filter(s=>s>=90).length, B: scores.filter(s=>s>=80&&s<90).length, C: scores.filter(s=>s>=75&&s<80).length, D: scores.filter(s=>s<75).length };
-            const dd = [predCounts.A, predCounts.B, predCounts.C, predCounts.D]; if (activeGradeChartInstance) { activeGradeChartInstance.data.datasets[0].data = dd; activeGradeChartInstance.update('none'); } else { activeGradeChartInstance = new Chart(document.getElementById('gradeAnalyticsDoughnutChart'), { type: 'doughnut', data: { labels: ['A', 'B', 'C', 'D'], datasets: [{ data: dd, backgroundColor: ['#0f766e', '#3b82f6', '#eab308', '#ef4444'], borderWidth: 0 }] }, options: { cutout: '75%', responsive: true, maintainAspectRatio: false, animation: false, plugins: { legend: { display: false } } } }); }
+            if (currentGradesRosterData.length === 0) return; const kkm = getKKM(); const scores = currentGradesRosterData.map(x => x.Nilai); const sum = scores.reduce((a, b) => a + b, 0); const avg = (sum / scores.length).toFixed(1); const passRate = Math.round((scores.filter(s => s >= kkm).length / scores.length) * 100);
+            document.getElementById('stat-rata').innerText = avg; document.getElementById('stat-passing-rate-badge').innerText = `${passRate}%`;
+            const pc = { A: 0, B: 0, C: 0, D: 0 }; scores.forEach(v => pc[getPredikat(v)]++);
+            const dd = [pc.A, pc.B, pc.C, pc.D]; if (activeGradeChartInstance) { activeGradeChartInstance.data.datasets[0].data = dd; activeGradeChartInstance.update('none'); } else { activeGradeChartInstance = new Chart(document.getElementById('gradeAnalyticsDoughnutChart'), { type: 'doughnut', data: { labels: ['A', 'B', 'C', 'D'], datasets: [{ data: dd, backgroundColor: ['#0f766e', '#3b82f6', '#eab308', '#ef4444'], borderWidth: 0 }] }, options: { cutout: '75%', responsive: true, maintainAspectRatio: false, animation: false, plugins: { legend: { display: false } } } }); }
         }
 
         function openPasteExcelModal() { document.getElementById('modal-paste-excel').classList.remove('hidden'); document.getElementById('excel-paste-box').value = ''; }
@@ -1984,7 +2142,7 @@ body :is(input,select,textarea)::placeholder{color:#334155;opacity:.9}
 
         async function saveBulkData(type) {
             const roster = type === 'Nilai' ? currentGradesRosterData : currentPresensiRosterData; if (roster.length === 0) return Swal.fire('Error', 'Kosong', 'warning');
-            showLoader(); try { const payload = roster.map(r => type === 'Nilai' ? { ID: r.ID, Tanggal: r.Tanggal, Kelas: r.Kelas, Mapel: r.Mapel, JenisPenilaian: r.JenisPenilaian, NISSiswa: r.NISSiswa, Nilai: r.Nilai } : { ID: r.ID, Tanggal: r.Tanggal, Kelas: r.Kelas, Mapel: r.Mapel, NISSiswa: r.NIS, Status: r.Status }); await server.run('batchUpdate', type, payload); Swal.fire('Berhasil', `Disimpan.`, 'success'); if (type === 'Nilai') renderArchiveGradesTable(); } catch (err) {} hideLoader();
+            showLoader(); try { const payload = roster.map(r => type === 'Nilai' ? { ID: r.ID, Tanggal: r.Tanggal, Kelas: r.Kelas, Mapel: r.Mapel, JenisPenilaian: r.JenisPenilaian, NISSiswa: r.NISSiswa, Nilai: r.Nilai, KKM: getKKM() } : { ID: r.ID, Tanggal: r.Tanggal, Kelas: r.Kelas, Mapel: r.Mapel, NISSiswa: r.NIS, Status: r.Status }); await server.run('batchUpdate', type, payload); Swal.fire('Berhasil', `Disimpan.`, 'success'); if (type === 'Nilai') renderArchiveGradesTable(); } catch (err) {} hideLoader();
         }
 
         async function renderArchiveGradesTable() {
@@ -1992,12 +2150,12 @@ body :is(input,select,textarea)::placeholder{color:#334155;opacity:.9}
                 const tbody = document.getElementById('archiveGradesTableBody'); if(!tbody) return;
                 const allowedClasses = getAssignedClasses(currentUser, globalClasses);
                 const relevantGrades = (await server.run('readData', 'Nilai')).filter(g => allowedClasses.includes(g.Kelas));
-                const grouped = {}; relevantGrades.forEach(g => { const key = `${g.Kelas}|${g.Mapel}|${g.JenisPenilaian}`; if(!grouped[key]) grouped[key] = []; grouped[key].push(parseInt(g.Nilai) || 0); });
+                const grouped = {}; relevantGrades.forEach(g => { const key = `${g.Kelas}|${g.Mapel}|${g.JenisPenilaian}`; if(!grouped[key]) grouped[key] = []; grouped[key].push(parseInt(g.Nilai) || 0); grouped[key].k = parseInt(g.KKM) || 75; });
                 tbody.innerHTML = '';
                 if(Object.keys(grouped).length === 0) { tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center">Belum ada riwayat.</td></tr>`; return; }
                 for (const key in grouped) {
-                    const [cls, mapel, jenis] = key.split('|'); const scores = grouped[key]; const avg = (scores.reduce((a,b)=>a+b,0) / scores.length).toFixed(1); const tuntasPct = Math.round((scores.filter(s=>s>=75).length / scores.length) * 100);
-                    tbody.innerHTML += `<tr class="hover:bg-slate-50 border-b"><td class="p-3 font-bold">Kls ${escapeHTML(cls)}</td><td class="p-3 text-teal-800 font-bold">${escapeHTML(mapel)}</td><td class="p-3 italic">${escapeHTML(jenis)}</td><td class="p-3 text-center font-black">${avg}</td><td class="p-3 text-center"><span class="px-2 py-1 rounded bg-emerald-50 text-emerald-700 text-[10px] font-bold">${tuntasPct}% Tuntas</span></td><td class="p-3 text-center"><button data-k="${escapeHTML(cls)}" data-m="${escapeHTML(mapel)}" data-j="${escapeHTML(jenis)}" onclick="openArchive(this)" class="text-xs bg-indigo-50 text-indigo-700 border px-3 py-1.5 rounded-lg">Buka</button></td></tr>`;
+                    const [cls, mapel, jenis] = key.split('|'); const scores = grouped[key]; const avg = (scores.reduce((a,b)=>a+b,0) / scores.length).toFixed(1); const tuntasPct = Math.round((scores.filter(s=>s>=(scores.k || 75)).length / scores.length) * 100);
+                    tbody.innerHTML += `<tr class="hover:bg-slate-50 border-b"><td class="p-3 font-bold">Kls ${escapeHTML(cls)}</td><td class="p-3 text-teal-800 font-bold">${escapeHTML(mapel)}</td><td class="p-3 italic">${escapeHTML(jenis)}</td><td class="p-3 text-center font-black">${avg}</td><td class="p-3 text-center"><span class="px-2 py-1 rounded bg-emerald-50 text-emerald-700 text-[10px] font-bold">${tuntasPct}% Tuntas &middot; KKM ${scores.k || 75}</span></td><td class="p-3 text-center"><button data-k="${escapeHTML(cls)}" data-m="${escapeHTML(mapel)}" data-j="${escapeHTML(jenis)}" onclick="openArchive(this)" class="text-xs bg-indigo-50 text-indigo-700 border px-3 py-1.5 rounded-lg">Buka</button></td></tr>`;
                 }
             } catch(e) {}
         }
@@ -2023,16 +2181,16 @@ body :is(input,select,textarea)::placeholder{color:#334155;opacity:.9}
                 const allowed = getAssignedClasses(currentUser, globalClasses);
                 const siswaArr = (await server.run('readData', 'Siswa')).filter(s => allowed.includes(s.Kelas)).sort(byClassName);
                 const by = {}; siswaArr.forEach(s => by[s.NIS] = s);
-                const data = (await server.run('readData', 'CatatanKasus')).filter(x => by[x.NISSiswa]).sort((a, b) => String(b.Tanggal).localeCompare(String(a.Tanggal)));
+                const data = (await server.run('readData', 'CatatanKasus')).filter(x => by[x.NISSiswa]).sort((a, b) => String(b.Tanggal).localeCompare(String(a.Tanggal))); window._kasusCache = data; window._poinMap = null;
                 const sel = document.getElementById('rec-kasus-siswa'), keep = sel.value;
                 sel.innerHTML = '<option value="">Pilih siswa...</option>' + siswaArr.map(s => `<option value="${escapeHTML(s.NIS)}">${escapeHTML(s.Nama)} (Kelas ${escapeHTML(s.Kelas)})</option>`).join(''); if (keep) sel.value = keep;
                 const manage = currentUser.role === 'admin' || currentUser.role === 'wali_kelas';
                 document.querySelector('#table-catatan-kasus tbody').innerHTML = data.map(d => {
                     const s = by[d.NISSiswa], done = d.Status === 'Selesai', canDel = manage || d.Pelapor === currentUser.nama;
-                    return `<tr class="border-b hover:bg-slate-50"><td class="p-4 text-xs font-bold">${escapeHTML(d.Tanggal)}</td><td class="p-4 font-bold text-slate-800">${escapeHTML(s.Nama)}<div class="text-[10px] text-slate-400 font-normal">Kelas ${escapeHTML(s.Kelas)}</div></td><td class="p-4 text-xs text-slate-500">${escapeHTML(d.Pelapor)}</td><td class="p-4 text-sm whitespace-normal min-w-[220px]">${escapeHTML(d.Uraian)}</td><td class="p-4 text-center"><span class="px-2.5 py-1 rounded-full text-[10px] font-bold ${done ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'}">${escapeHTML(d.Status)}</span></td><td class="p-4 text-center"><div class="flex items-center justify-center gap-2">${manage ? `<button onclick="toggleKasusStatus('${escapeHTML(d.ID)}', '${escapeHTML(d.Status)}')" title="${done ? 'Buka kembali' : 'Tandai selesai'}" class="text-emerald-600 hover:text-emerald-800"><i class="fas ${done ? 'fa-rotate-left' : 'fa-circle-check'}"></i></button>` : ''}${canDel ? `<button onclick="deleteRowData('CatatanKasus', '${escapeHTML(d.ID)}')" class="text-rose-500 hover:text-rose-700"><i class="fas fa-trash"></i></button>` : ''}</div></td></tr>`;
-                }).join('') || '<tr><td colspan="6" class="p-8 text-center text-slate-400 text-sm">Belum ada laporan kasus.</td></tr>';
+                    return `<tr class="border-b hover:bg-slate-50"><td class="p-4 text-xs font-bold">${escapeHTML(d.Tanggal)}</td><td class="p-4 font-bold text-slate-800">${escapeHTML(s.Nama)}<div class="text-[10px] text-slate-400 font-normal">Kelas ${escapeHTML(s.Kelas)}</div></td><td class="p-4 text-xs text-slate-500">${escapeHTML(d.Pelapor)}</td><td class="p-4 text-sm whitespace-normal min-w-[220px]">${escapeHTML(d.Uraian)}</td><td class="p-4 text-center whitespace-nowrap">${poinCell('CatatanKasus', d)}</td><td class="p-4 text-center"><span class="px-2.5 py-1 rounded-full text-[10px] font-bold ${done ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'}">${escapeHTML(d.Status)}</span></td><td class="p-4 text-center"><div class="flex items-center justify-center gap-2">${manage ? `<button onclick="toggleKasusStatus('${escapeHTML(d.ID)}', '${escapeHTML(d.Status)}')" title="${done ? 'Buka kembali' : 'Tandai selesai'}" class="text-emerald-600 hover:text-emerald-800"><i class="fas ${done ? 'fa-rotate-left' : 'fa-circle-check'}"></i></button>` : ''}${canDel ? `<button onclick="deleteRowData('CatatanKasus', '${escapeHTML(d.ID)}')" class="text-rose-500 hover:text-rose-700"><i class="fas fa-trash"></i></button>` : ''}</div></td></tr>`;
+                }).join('') || '<tr><td colspan="7" class="p-8 text-center text-slate-400 text-sm">Belum ada laporan kasus.</td></tr>';
                 const selesai = data.filter(d => d.Status === 'Selesai').length;
-                document.getElementById('kasus-analysis').innerHTML = statBox('Total Laporan', data.length, 'blue') + statBox('Belum Selesai', data.length - selesai, 'rose') + statBox('Selesai', selesai, 'emerald') + statBox('Siswa Terlibat', new Set(data.map(d => d.NISSiswa)).size, 'amber');
+                document.getElementById('kasus-analysis').innerHTML = statBox('Total Laporan', data.length, 'blue') + statBox('Belum Selesai', data.length - selesai, 'rose') + statBox('Selesai', selesai, 'emerald') + statBox('Siswa Terlibat', new Set(data.map(d => d.NISSiswa)).size, 'amber') + statBox('Total Poin', data.reduce((p, d) => p + (parseInt(d.PoinPelanggaran) || 0), 0), 'rose');
             } catch (e) {}
             hideLoader();
         }
@@ -2041,7 +2199,7 @@ body :is(input,select,textarea)::placeholder{color:#334155;opacity:.9}
             try { await server.run('updateData', 'CatatanKasus', id, { Status: cur === 'Selesai' ? 'Tercatat' : 'Selesai' }); await loadDataCatatanKasus(); toast.fire({ icon: 'success', title: 'Status diperbarui' }); } catch (e) {}
             hideLoader();
         }
-        async function addKasusRecord(e) { e.preventDefault(); showLoader(); const payload = { ID: 'k_'+Date.now(), Tanggal: document.getElementById('rec-kasus-tgl').value, NISSiswa: document.getElementById('rec-kasus-siswa').value, Pelapor: currentUser.nama, Uraian: document.getElementById('rec-kasus-uraian').value, Status: 'Tercatat' }; try { await server.run('createData', 'CatatanKasus', payload); await server.run('createData', 'Pendampingan', { ID: 'p_' + payload.ID, KasusID: payload.ID, Tanggal: payload.Tanggal, NISSiswa: payload.NISSiswa, Jenis: 'Perilaku', Metode: 'Laporan Kasus', Uraian: payload.Uraian, Solusi: 'Menunggu tindak lanjut wali kelas', Sumber: 'Laporan Kasus' }); document.getElementById('form-add-kasus').reset(); loadDataCatatanKasus(); toast.fire({icon:'success', title:'Tersimpan.'}); } catch(e){} hideLoader(); }
+        async function addKasusRecord(e) { e.preventDefault(); showLoader(); const payload = { ID: 'k_'+Date.now(), Tanggal: document.getElementById('rec-kasus-tgl').value, NISSiswa: document.getElementById('rec-kasus-siswa').value, Pelapor: currentUser.nama, Uraian: document.getElementById('rec-kasus-uraian').value, Status: 'Tercatat', PoinPelanggaran: Math.max(0, parseInt(document.getElementById('rec-kasus-poin').value) || 0) }; try { await server.run('createData', 'CatatanKasus', payload); await server.run('createData', 'Pendampingan', { ID: 'p_' + payload.ID, KasusID: payload.ID, Tanggal: payload.Tanggal, NISSiswa: payload.NISSiswa, Jenis: 'Perilaku', Metode: 'Laporan Kasus', Uraian: payload.Uraian, Solusi: 'Menunggu tindak lanjut wali kelas', Sumber: 'Laporan Kasus', PoinPelanggaran: payload.PoinPelanggaran }); document.getElementById('form-add-kasus').reset(); loadDataCatatanKasus(); toast.fire({icon:'success', title:'Tersimpan.'}); } catch(e){} hideLoader(); }
 
         async function loadDataPendampingan() {
             showLoader();
@@ -2050,15 +2208,15 @@ body :is(input,select,textarea)::placeholder{color:#334155;opacity:.9}
                 const siswaArr = (await server.run('readData', 'Siswa')).filter(s => allowed.includes(s.Kelas)).sort(byClassName);
                 const by = {}; siswaArr.forEach(s => by[s.NIS] = s);
                 const data = (await server.run('readData', 'Pendampingan')).filter(x => by[x.NISSiswa]).sort((a, b) => String(b.Tanggal).localeCompare(String(a.Tanggal)));
-                window._pendCache = data;
+                window._pendCache = data; window._poinMap = null;
                 const sel = document.getElementById('rec-pendampingan-siswa'), keep = sel.value;
                 sel.innerHTML = '<option value="">Pilih siswa...</option>' + siswaArr.map(s => `<option value="${escapeHTML(s.NIS)}">${escapeHTML(s.Nama)} (Kelas ${escapeHTML(s.Kelas)})</option>`).join(''); if (keep) sel.value = keep;
                 document.querySelector('#table-pendampingan tbody').innerHTML = data.map(d => {
                     const s = by[d.NISSiswa], fromKasus = d.Sumber === 'Laporan Kasus', waiting = String(d.Solusi || '').indexOf('Menunggu') === 0;
-                    return `<tr class="border-b hover:bg-slate-50"><td class="p-4 text-xs font-bold">${escapeHTML(d.Tanggal)}</td><td class="p-4 font-bold text-slate-800">${escapeHTML(s.Nama)}<div class="text-[10px] text-slate-400 font-normal">Kelas ${escapeHTML(s.Kelas)}</div></td><td class="p-4 text-xs"><span class="bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded font-bold">${escapeHTML(d.Jenis)}</span>${fromKasus ? '<div class="mt-1"><span class="bg-blue-50 text-blue-700 px-2 py-0.5 rounded font-bold text-[10px]"><i class="fas fa-link mr-1"></i>Laporan Kasus</span></div>' : ''}</td><td class="p-4 text-xs">${escapeHTML(d.Metode)}</td><td class="p-4 text-sm whitespace-normal min-w-[200px]">${escapeHTML(d.Uraian)}</td><td class="p-4 text-sm whitespace-normal min-w-[200px] ${waiting ? 'text-amber-600 italic' : 'text-emerald-700'}">${escapeHTML(d.Solusi)}</td><td class="p-4 text-center"><div class="flex items-center justify-center gap-3"><button onclick="editTindakLanjut('${escapeHTML(d.ID)}')" title="Isi / ubah tindak lanjut" class="text-indigo-600 hover:text-indigo-800"><i class="fas fa-pen-to-square"></i></button><button onclick="deleteRowData('Pendampingan', '${escapeHTML(d.ID)}')" class="text-rose-500 hover:text-rose-700"><i class="fas fa-trash"></i></button></div></td></tr>`;
-                }).join('') || '<tr><td colspan="7" class="p-8 text-center text-slate-400 text-sm">Belum ada catatan pendampingan.</td></tr>';
+                    return `<tr class="border-b hover:bg-slate-50"><td class="p-4 text-xs font-bold">${escapeHTML(d.Tanggal)}</td><td class="p-4 font-bold text-slate-800">${escapeHTML(s.Nama)}<div class="text-[10px] text-slate-400 font-normal">Kelas ${escapeHTML(s.Kelas)}</div></td><td class="p-4 text-xs"><span class="bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded font-bold">${escapeHTML(d.Jenis)}</span>${fromKasus ? '<div class="mt-1"><span class="bg-blue-50 text-blue-700 px-2 py-0.5 rounded font-bold text-[10px]"><i class="fas fa-link mr-1"></i>Laporan Kasus</span></div>' : ''}</td><td class="p-4 text-xs">${escapeHTML(d.Metode)}</td><td class="p-4 text-sm whitespace-normal min-w-[200px]">${escapeHTML(d.Uraian)}</td><td class="p-4 text-sm whitespace-normal min-w-[200px] ${waiting ? 'text-amber-600 italic' : 'text-emerald-700'}">${escapeHTML(d.Solusi)}</td><td class="p-4 text-center whitespace-nowrap">${poinCell('Pendampingan', d)}</td><td class="p-4 text-center"><div class="flex items-center justify-center gap-3"><button onclick="editTindakLanjut('${escapeHTML(d.ID)}')" title="Isi / ubah tindak lanjut" class="text-indigo-600 hover:text-indigo-800"><i class="fas fa-pen-to-square"></i></button><button onclick="deleteRowData('Pendampingan', '${escapeHTML(d.ID)}')" class="text-rose-500 hover:text-rose-700"><i class="fas fa-trash"></i></button></div></td></tr>`;
+                }).join('') || '<tr><td colspan="8" class="p-8 text-center text-slate-400 text-sm">Belum ada catatan pendampingan.</td></tr>';
                 const c = k => data.filter(d => d.Jenis === k).length;
-                document.getElementById('pend-analysis').innerHTML = statBox('Total Catatan', data.length, 'blue') + statBox('Akademik', c('Akademik'), 'indigo') + statBox('Perilaku', c('Perilaku'), 'amber') + statBox('Dari Laporan Kasus', data.filter(d => d.Sumber === 'Laporan Kasus').length, 'emerald');
+                document.getElementById('pend-analysis').innerHTML = statBox('Total Catatan', data.length, 'blue') + statBox('Akademik', c('Akademik'), 'indigo') + statBox('Perilaku', c('Perilaku'), 'amber') + statBox('Dari Laporan Kasus', data.filter(d => d.Sumber === 'Laporan Kasus').length, 'emerald') + statBox('Total Poin', data.reduce((p, d) => p + (parseInt(d.PoinPelanggaran) || 0), 0), 'rose');
             } catch (e) {}
             hideLoader();
         }
@@ -2074,77 +2232,131 @@ body :is(input,select,textarea)::placeholder{color:#334155;opacity:.9}
             } catch (e) {}
             hideLoader();
         }
-        async function addPendampinganRecord(e) { e.preventDefault(); showLoader(); const payload = { ID: 'p_'+Date.now(), Tanggal: document.getElementById('rec-pendampingan-tgl').value, NISSiswa: document.getElementById('rec-pendampingan-siswa').value, Jenis: document.getElementById('rec-pendampingan-jenis').value, Metode: document.getElementById('rec-pendampingan-metode').value, Uraian: document.getElementById('rec-pendampingan-uraian').value, Solusi: document.getElementById('rec-pendampingan-solusi').value }; try { await server.run('createData', 'Pendampingan', payload); document.getElementById('form-add-pendampingan').reset(); loadDataPendampingan(); toast.fire({icon:'success', title:'Tersimpan.'}); } catch(e){} hideLoader(); }
+        async function addPendampinganRecord(e) { e.preventDefault(); showLoader(); const payload = { ID: 'p_'+Date.now(), Tanggal: document.getElementById('rec-pendampingan-tgl').value, NISSiswa: document.getElementById('rec-pendampingan-siswa').value, Jenis: document.getElementById('rec-pendampingan-jenis').value, Metode: document.getElementById('rec-pendampingan-metode').value, Uraian: document.getElementById('rec-pendampingan-uraian').value, Solusi: document.getElementById('rec-pendampingan-solusi').value, PoinPelanggaran: Math.max(0, parseInt(document.getElementById('rec-pendampingan-poin').value) || 0) }; try { await server.run('createData', 'Pendampingan', payload); document.getElementById('form-add-pendampingan').reset(); loadDataPendampingan(); toast.fire({icon:'success', title:'Tersimpan.'}); } catch(e){} hideLoader(); }
 
         async function initTahfidzView() {
             showLoader(); try {
+                activeJuz = 30; // default saat modul dibuka
                 const allowedClasses = getAssignedClasses(currentUser, globalClasses);
                 document.getElementById('filter-matrix-kelas-tahfidz').innerHTML = allowedClasses.map(c => `<option value="${escapeHTML(c)}">Kelas ${escapeHTML(c)}</option>`).join('');
                 const siswaArr = (await server.run('readData', 'Siswa')).filter(s => allowedClasses.includes(s.Kelas));
                 document.getElementById('rec-hafalan-siswa').innerHTML = '<option value="">Pilih Siswa...</option>' + siswaArr.map(s => `<option value="${escapeHTML(s.NIS)}">${escapeHTML(s.Nama)} (Kls ${escapeHTML(s.Kelas)})</option>`).join('');
-                document.getElementById('rec-hafalan-surah').innerHTML = '<option value="">Pilih Surah...</option>' + JUZ30_REVERSE.map(s => `<option value="${s.name}">${s.name} (${s.ayahs} Ayat)</option>`).join('');
                 document.getElementById('rec-hafalan-tgl').value = localISO();
-                
-                const headerRow = document.getElementById('matrix-header-row-tahfidz');
-                document.querySelectorAll('.dynamic-surah-col').forEach(el => el.remove());
-                let htmlToInsert = '';
-                JUZ30_REVERSE.forEach(surah => { htmlToInsert += `<th class="dynamic-surah-col p-1.5 border border-black text-center align-middle font-bold text-[9px] w-6 uppercase whitespace-nowrap" style="writing-mode: vertical-rl; transform: rotate(180deg); height: 160px; line-height: 1;">${surah.name} <span class="font-normal opacity-80 mt-1">${surah.ayahs} AYAT</span></th>`; });
-                headerRow.children[1].insertAdjacentHTML('afterend', htmlToInsert);
+                renderJuzTabs(); buildTahfidzHeader(); fillHafalanSurahOptions();
                 await renderTahfidzMatrix();
             } catch(e) {} hideLoader();
         }
+        function renderJuzTabs() {
+            const box = document.getElementById('tahfidz-juz-tabs'); if (!box) return;
+            let h = '<span class="shrink-0 text-[10px] font-extrabold text-slate-400 uppercase tracking-widest mr-1">Juz</span>';
+            for (let j = 30; j >= 1; j--) h += `<button type="button" onclick="setTahfidzJuz(${j})" data-juz="${j}" class="shrink-0 min-w-[44px] min-h-[40px] px-3 rounded-xl text-xs font-black transition ${j === activeJuz ? 'bg-emerald-700 text-white shadow' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}">${j}</button>`;
+            box.innerHTML = h; const a = box.querySelector(`[data-juz="${activeJuz}"]`); if (a) box.scrollLeft = a.offsetLeft - box.clientWidth / 2 + a.offsetWidth / 2;
+        }
+        function setTahfidzJuz(j) { activeJuz = parseInt(j) || 30; renderJuzTabs(); buildTahfidzHeader(); fillHafalanSurahOptions(); updateMaxAyatInfo(); renderTahfidzMatrix(); }
+        function fillHafalanSurahOptions() {
+            document.getElementById('rec-hafalan-surah').innerHTML = '<option value="">Pilih Surah...</option>' + JUZ_DATA[activeJuz].map(x => `<option value="${escapeHTML(x.name)}">${escapeHTML(x.name)} (${isPartialSurah(x) ? 'ayat ' + x.from + '\u2013' + x.to : x.ayahs + ' Ayat'})</option>`).join('');
+            const l = document.getElementById('lbl-juz-aktif'); if (l) l.innerText = `Juz ${activeJuz}`;
+        }
+        function buildTahfidzHeader() {
+            const JUZ = JUZ_DATA[activeJuz], headerRow = document.getElementById('matrix-header-row-tahfidz');
+            headerRow.querySelectorAll('.dynamic-surah-col').forEach(el => el.remove());
+            let h = ''; JUZ.forEach(x => { h += `<th class="dynamic-surah-col p-1.5 border border-black text-center align-middle font-bold text-[9px] w-6 uppercase whitespace-nowrap" style="writing-mode: vertical-rl; transform: rotate(180deg); height: 160px; line-height: 1;">${escapeHTML(x.name)} <span class="font-normal opacity-80 mt-1">${isPartialSurah(x) ? x.from + '\u2013' + x.to : x.ayahs + ' AYAT'}</span></th>`; });
+            headerRow.children[1].insertAdjacentHTML('afterend', h);
+            const th = document.getElementById('tahfidz-colspan-th'); if (th) { th.colSpan = JUZ.length; th.textContent = `NAMA SURAH (JUZ ${activeJuz})`; }
+            const t = document.getElementById('kpi-tahfidz-target'); if (t) t.innerText = JUZ.length;
+        }
 
-        function updateMaxAyatInfo() { const m = JUZ30_REVERSE.find(s => s.name === document.getElementById('rec-hafalan-surah').value); const i = document.getElementById('max-ayat-info'), a = document.getElementById('rec-hafalan-ayat'); if(m){i.innerText=`/ ${m.ayahs} Ayat`; a.max=m.ayahs;}else{i.innerText=`/ -`; a.max="";} }
-        
+        function updateMaxAyatInfo() { const m = JUZ_DATA[activeJuz].find(x => x.name === document.getElementById('rec-hafalan-surah').value); const i = document.getElementById('max-ayat-info'), a = document.getElementById('rec-hafalan-ayat'); if (m) { i.innerText = `/ ${m.to}`; a.max = m.to; a.min = m.from; a.placeholder = `${m.from}\u2013${m.to}`; } else { i.innerText = `/ -`; a.max = ""; a.min = 1; } }
+
         async function addHafalanRecord(e) {
             e.preventDefault(); showLoader();
             const surahName = document.getElementById('rec-hafalan-surah').value, inputAyat = parseInt(document.getElementById('rec-hafalan-ayat').value);
-            const match = JUZ30_REVERSE.find(s => s.name === surahName);
-            if(!match) { hideLoader(); return Swal.fire('Error', 'Pilih surah.', 'error'); } if(inputAyat > match.ayahs) { hideLoader(); return Swal.fire('Error', `Ayat max ${match.ayahs}.`, 'error'); }
-            const payload = { ID: 'h_'+Date.now(), Tanggal: document.getElementById('rec-hafalan-tgl').value, NISSiswa: document.getElementById('rec-hafalan-siswa').value, JuzHafalan: "30", SurahJuz: surahName, Ayat: inputAyat.toString(), Predikat: inputAyat === match.ayahs ? 'Selesai' : 'Proses' };
+            const match = JUZ_DATA[activeJuz].find(x => x.name === surahName);
+            if (!match) { hideLoader(); return Swal.fire('Error', 'Pilih surah.', 'error'); } if (isNaN(inputAyat) || inputAyat > match.to || inputAyat < match.from) { hideLoader(); return Swal.fire('Error', `Ayat harus antara ${match.from} dan ${match.to}.`, 'error'); }
+            const payload = { ID: 'h_' + Date.now(), Tanggal: document.getElementById('rec-hafalan-tgl').value, NISSiswa: document.getElementById('rec-hafalan-siswa').value, JuzHafalan: String(activeJuz), SurahJuz: surahName, Ayat: inputAyat.toString(), Predikat: inputAyat >= match.to ? 'Selesai' : 'Proses' };
             try { await server.run('createData', 'Hafalan', payload); document.getElementById('rec-hafalan-ayat').value = ''; toast.fire({icon:'success', title:'Tersimpan.'}); await renderTahfidzMatrix(); } catch(e){} hideLoader();
         }
 
-        async function renderTahfidzMatrix() {
-            const cls = document.getElementById('filter-matrix-kelas-tahfidz').value; if(!cls) return;
+        // ===== Input massal =====
+        async function openBulkHafalan() {
+            const src = document.getElementById('rec-hafalan-siswa'), sel = document.getElementById('bulk-hafalan-siswa');
+            sel.innerHTML = src.innerHTML; sel.value = src.value || '';
+            let jo = ''; for (let j = 30; j >= 1; j--) jo += `<option value="${j}">Juz ${j}</option>`;
+            const js = document.getElementById('bulk-hafalan-juz'); js.innerHTML = jo; js.value = String(activeJuz);
+            document.getElementById('bulk-hafalan-tgl').value = localISO();
+            document.getElementById('modal-bulk-hafalan').classList.remove('hidden');
+            if (!window._hafalanCache) { try { window._hafalanCache = await server.run('readData', 'Hafalan'); } catch (e) { window._hafalanCache = []; } }
+            renderBulkSurahList();
+        }
+        function closeBulkHafalan() { document.getElementById('modal-bulk-hafalan').classList.add('hidden'); }
+        function renderBulkSurahList() {
+            const juz = parseInt(document.getElementById('bulk-hafalan-juz').value) || 30, nis = document.getElementById('bulk-hafalan-siswa').value;
+            const best = {}; (window._hafalanCache || []).forEach(l => { if (String(l.NISSiswa) !== String(nis) || String(l.JuzHafalan || '30') !== String(juz)) return; const a = parseInt(l.Ayat) || 0; if (!best[l.SurahJuz] || a > best[l.SurahJuz]) best[l.SurahJuz] = a; });
+            setHTMLFast(document.getElementById('bulk-surah-list'), JUZ_DATA[juz].map(x => { const done = (best[x.name] || 0) >= x.to; return `<label class="bulk-item flex items-center gap-2 p-2.5 border rounded-xl text-xs font-bold cursor-pointer ${done ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-white hover:bg-slate-50'}"><input type="checkbox" class="bulk-surah-cb w-5 h-5 accent-emerald-600" value="${escapeHTML(x.name)}" ${done ? 'checked disabled' : ''} onchange="updateBulkCount()"><span class="flex-1">${escapeHTML(x.name)}<span class="block font-normal text-[10px] opacity-70">${done ? 'Sudah selesai' : surahRangeLabel(x)}</span></span></label>`; }).join(''));
+            updateBulkCount();
+        }
+        function bulkSelectAll(on) { document.querySelectorAll('#bulk-surah-list .bulk-surah-cb:not(:disabled)').forEach(c => c.checked = on); updateBulkCount(); }
+        function updateBulkCount() { document.getElementById('bulk-count').innerText = `${document.querySelectorAll('#bulk-surah-list .bulk-surah-cb:checked:not(:disabled)').length} surah dipilih`; }
+        async function saveBulkHafalan() {
+            const nis = document.getElementById('bulk-hafalan-siswa').value, juz = parseInt(document.getElementById('bulk-hafalan-juz').value) || 30, tgl = document.getElementById('bulk-hafalan-tgl').value;
+            const picked = [...document.querySelectorAll('#bulk-surah-list .bulk-surah-cb:checked:not(:disabled)')].map(c => c.value);
+            if (!nis) return invalid('Pilih siswa terlebih dahulu.'); if (!tgl) return invalid('Isi tanggal setoran.'); if (!picked.length) return invalid('Centang minimal satu surah.');
+            const base = Date.now(), recs = picked.map((nm, i) => { const x = JUZ_DATA[juz].find(y => y.name === nm); return { ID: `h_${base}_${i}`, Tanggal: tgl, NISSiswa: nis, JuzHafalan: String(juz), SurahJuz: nm, Ayat: String(x.to), Predikat: 'Selesai' }; });
+            const btn = document.getElementById('btn-save-bulk-hafalan'); busy(btn, true); showLoader();
             try {
-                const siswaKelas = (await server.run('readData', 'Siswa')).filter(s => s.Kelas === cls).sort((a, b) => a.Nama.localeCompare(b.Nama));
-                const allLogs = await server.run('readData', 'Hafalan');
-                const tbody = document.getElementById('matrix-body-tahfidz'); tbody.innerHTML = '';
+                for (let i = 0; i < recs.length; i += 5) await Promise.all(recs.slice(i, i + 5).map(r => server.run('createData', 'Hafalan', r)));
+                window._hafalanCache = (window._hafalanCache || []).concat(recs);
+                toast.fire({ icon: 'success', title: `${recs.length} surah dicatat selesai.` }); closeBulkHafalan();
+                if (juz !== activeJuz) setTahfidzJuz(juz); else await renderTahfidzMatrix();
+            } catch (e) { window._hafalanCache = null; }
+            hideLoader(); busy(btn, false);
+        }
+
+        async function renderTahfidzMatrix() {
+            const cls = document.getElementById('filter-matrix-kelas-tahfidz').value; if (!cls) return;
+            const JUZ = JUZ_DATA[activeJuz], N = JUZ.length, token = ++_tahfidzRenderToken;
+            try {
+                const [siswaAll, allLogs] = await Promise.all([server.run('readData', 'Siswa'), server.run('readData', 'Hafalan')]);
+                if (token !== _tahfidzRenderToken) return;
+                window._hafalanCache = allLogs;
+                const siswaKelas = siswaAll.filter(s => s.Kelas === cls).sort((a, b) => a.Nama.localeCompare(b.Nama));
+                const tbody = document.getElementById('matrix-body-tahfidz');
                 let totalLulus = 0, sumCapaianClass = 0;
-
-                if(siswaKelas.length === 0) { tbody.innerHTML = `<tr><td colspan="44" class="p-4 text-center">Kosong</td></tr>`; return; }
-
-                siswaKelas.forEach((siswa, index) => {
-                    const studentLogs = allLogs.filter(log => String(log.NISSiswa) === String(siswa.NIS));
-                    const memorizedMap = {}; studentLogs.forEach(log => { const ayatNum = parseInt(log.Ayat) || 0; if (!memorizedMap[log.SurahJuz] || ayatNum > memorizedMap[log.SurahJuz]) memorizedMap[log.SurahJuz] = ayatNum; });
-                    let totalSurahCompleted = 0, totalAyatMemorized = 0, matrixCellsHtml = '';
-                    JUZ30_REVERSE.forEach(surah => {
-                        const lastAyat = memorizedMap[surah.name] || 0; let cellContent = '', cellClass = 'p-1 border border-black text-center font-bold text-xs h-8 w-6', inlineStyle = '';
-                        if (lastAyat >= surah.ayahs) { cellContent = '&#10004;'; cellClass += ' bg-[#C8E6C9] text-[#1B5E20] print:!bg-[#C8E6C9] print:!text-[#1B5E20] text-sm'; inlineStyle = 'background-color: #C8E6C9 !important; color: #1B5E20 !important;'; totalSurahCompleted++; totalAyatMemorized += surah.ayahs; } 
-                        else if (lastAyat > 0) { cellContent = lastAyat; cellClass += ' bg-[#FFF9C4] text-[#B78103] print:!bg-[#FFF9C4] print:!text-[#B78103]'; inlineStyle = 'background-color: #FFF9C4 !important; color: #B78103 !important;'; totalAyatMemorized += lastAyat; }
-                        matrixCellsHtml += `<td class="${cellClass}" style="${inlineStyle}">${cellContent}</td>`;
+                if (siswaKelas.length === 0) { tbody.innerHTML = `<tr><td colspan="${N + 6}" class="p-4 text-center">Kosong</td></tr>`; }
+                else {
+                    const byNis = new Map();
+                    allLogs.forEach(l => { if (String(l.JuzHafalan || '30') !== String(activeJuz)) return; const k = String(l.NISSiswa); let m = byNis.get(k); if (!m) byNis.set(k, m = {}); const a = parseInt(l.Ayat) || 0; if (!m[l.SurahJuz] || a > m[l.SurahJuz]) m[l.SurahJuz] = a; });
+                    const base = 'p-1 border border-black text-center font-bold text-xs h-8 w-6';
+                    const rows = siswaKelas.map((siswa, index) => {
+                        const memo = byNis.get(String(siswa.NIS)) || {}; let done = 0, ayatTot = 0, cells = '';
+                        JUZ.forEach(x => {
+                            const last = memo[x.name] || 0;
+                            if (last >= x.to) { cells += `<td class="${base} bg-[#C8E6C9] text-[#1B5E20] print:!bg-[#C8E6C9] print:!text-[#1B5E20] text-sm" style="background-color: #C8E6C9 !important; color: #1B5E20 !important;">&#10004;</td>`; done++; ayatTot += x.ayahs; }
+                            else if (last >= x.from) { cells += `<td class="${base} bg-[#FFF9C4] text-[#B78103] print:!bg-[#FFF9C4] print:!text-[#B78103]" style="background-color: #FFF9C4 !important; color: #B78103 !important;">${last}</td>`; ayatTot += last - x.from + 1; }
+                            else cells += `<td class="${base}"></td>`;
+                        });
+                        const pct = Math.round((done / N) * 100); sumCapaianClass += pct;
+                        const badge = done === N ? (totalLulus++, `<span class="px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 font-bold text-[10px] print:bg-transparent print:text-black print:p-0">LULUS JUZ ${activeJuz}</span>`) : done > 0 || ayatTot > 0 ? `<span class="px-2 py-0.5 rounded bg-amber-100 text-amber-800 font-bold text-[10px] print:bg-transparent print:text-black print:p-0">PROSES</span>` : `<span class="text-slate-400 text-[10px] print:text-black">-</span>`;
+                        return `<tr class="hover:bg-slate-50 border-b border-black print:border-black"><td class="p-2 border border-black text-center font-black sticky left-0 z-10 bg-white shadow-[2px_0_5px_rgba(0,0,0,0.1)] print:shadow-none print:bg-transparent">${index + 1}</td><td class="p-2 border border-black font-bold text-xs truncate max-w-[200px] sticky left-8 z-10 bg-white shadow-[2px_0_5px_rgba(0,0,0,0.1)] print:shadow-none print:bg-transparent print:whitespace-nowrap">${escapeHTML(siswa.Nama)}</td>${cells}<td class="p-2 border border-black text-center font-black">${done}</td><td class="p-2 border border-black text-center font-bold">${ayatTot}</td><td class="p-2 border border-black text-center font-black text-emerald-700 print:text-black">${pct}%</td><td class="p-2 border border-black text-center">${badge}</td></tr>`;
                     });
-
-                    const pctCapaian = Math.round((totalSurahCompleted / 38) * 100); sumCapaianClass += pctCapaian;
-                    let statusBadge = totalSurahCompleted === 38 ? (totalLulus++, `<span class="px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 font-bold text-[10px] print:bg-transparent print:text-black print:p-0">LULUS JUZ 30</span>`) : totalSurahCompleted > 0 ? `<span class="px-2 py-0.5 rounded bg-amber-100 text-amber-800 font-bold text-[10px] print:bg-transparent print:text-black print:p-0">PROSES</span>` : `<span class="text-slate-400 text-[10px] print:text-black">-</span>`;
-                    tbody.innerHTML += `<tr class="hover:bg-slate-50 border-b border-black print:border-black"><td class="p-2 border border-black text-center font-black sticky left-0 z-10 bg-white shadow-[2px_0_5px_rgba(0,0,0,0.1)] print:shadow-none print:bg-transparent">${index + 1}</td><td class="p-2 border border-black font-bold text-xs truncate max-w-[200px] sticky left-8 z-10 bg-white shadow-[2px_0_5px_rgba(0,0,0,0.1)] print:shadow-none print:bg-transparent print:whitespace-nowrap">${escapeHTML(siswa.Nama)}</td>${matrixCellsHtml}<td class="p-2 border border-black text-center font-black">${totalSurahCompleted}</td><td class="p-2 border border-black text-center font-bold">${totalAyatMemorized}</td><td class="p-2 border border-black text-center font-black text-emerald-700 print:text-black">${pctCapaian}%</td><td class="p-2 border border-black text-center">${statusBadge}</td></tr>`;
-                });
+                    renderRowsChunked(tbody, rows, null, 25);
+                }
                 document.getElementById('kpi-tahfidz-siswa').innerText = siswaKelas.length; document.getElementById('kpi-tahfidz-lulus').innerText = totalLulus; document.getElementById('kpi-tahfidz-avg').innerText = siswaKelas.length > 0 ? `${Math.round(sumCapaianClass / siswaKelas.length)}%` : '0%';
-                
-                document.getElementById('pdf-header-kelas').innerText = `KELAS ${cls}`; document.getElementById('pdf-tahun-ajaran').innerText = 'TAHUN AJARAN ' + tahunAjaran() + ' • TARGET: JUZ 30'; if(globalSettings.Logo) document.getElementById('pdf-logo-sekolah').src = globalSettings.Logo;
+                document.getElementById('pdf-header-kelas').innerText = `KELAS ${cls} \u2022 JUZ ${activeJuz}`; document.getElementById('pdf-tahun-ajaran').innerText = 'TAHUN AJARAN ' + tahunAjaran() + ' \u2022 TARGET: JUZ ' + activeJuz; if (globalSettings.Logo) document.getElementById('pdf-logo-sekolah').src = globalSettings.Logo;
                 document.getElementById('pdf-date-today').innerText = new Date().toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' }); document.getElementById('pdf-nama-guru').innerText = currentUser.nama;
             } catch (e) {}
         }
 
         function exportTahfidzMatrixExcel() {
-            const cls = document.getElementById('filter-matrix-kelas-tahfidz').value; if(!cls) return Swal.fire('Error', 'Kosong.', 'warning'); showLoader();
+            const cls = document.getElementById('filter-matrix-kelas-tahfidz').value; if (!cls) return Swal.fire('Error', 'Kosong.', 'warning');
+            const JUZ = JUZ_DATA[activeJuz], N = JUZ.length; const rows = document.getElementById('matrix-body-tahfidz').querySelectorAll('tr');
+            if (!rows.length || rows[0].querySelectorAll('td').length < N + 6) return Swal.fire('Info', 'Matriks belum selesai dimuat / kosong.', 'info'); showLoader();
             try {
-                const wsData = []; let headerRow = ["NO", "NAMA SISWA"]; JUZ30_REVERSE.forEach(s => headerRow.push(`${s.name} (${s.ayahs} Ayat)`)); headerRow.push("TOTAL SURAH", "TOTAL AYAT", "% CAPAIAN", "STATUS"); wsData.push(headerRow);
-                const rows = document.getElementById('matrix-body-tahfidz').querySelectorAll('tr');
-                rows.forEach(tr => { const rowData = []; const tds = tr.querySelectorAll('td'); if(tds.length < 40) return; rowData.push(tds[0].innerText, tds[1].innerText); for(let i=2; i<=39; i++) { let val = tds[i].innerText.trim(); if(val.includes('✔') || val === '✔' || val === '✓') val = '✓'; rowData.push(val); } const rowNum = wsData.length + 1; rowData.push({ t: 'n', f: `COUNTIF(C${rowNum}:AN${rowNum}, "✓")` }); rowData.push(parseInt(tds[41].innerText) || 0); rowData.push({ t: 'n', f: `ROUND((AO${rowNum}/38)*100, 0)` }); rowData.push(tds[43].innerText.replace(/[\n\r]/g, ' ').trim()); wsData.push(rowData); });
+                const wsData = [["NO", "NAMA SISWA", ...JUZ.map(x => `${x.name} (${isPartialSurah(x) ? x.from + '-' + x.to : x.ayahs + ' Ayat'})`), "TOTAL SURAH", "TOTAL AYAT", "% CAPAIAN", "STATUS"]];
+                const c1 = XLSX.utils.encode_col(2), c2 = XLSX.utils.encode_col(1 + N), cTot = XLSX.utils.encode_col(2 + N);
+                rows.forEach(tr => { const tds = tr.querySelectorAll('td'); if (tds.length < N + 6) return; const rowData = [tds[0].innerText, tds[1].innerText]; for (let i = 2; i < 2 + N; i++) { let v = tds[i].innerText.trim(); if (v.includes('\u2714') || v === '\u2713') v = '\u2713'; rowData.push(v); } const r = wsData.length + 1; rowData.push({ t: 'n', f: `COUNTIF(${c1}${r}:${c2}${r}, "\u2713")` }); rowData.push(parseInt(tds[3 + N].innerText) || 0); rowData.push({ t: 'n', f: `ROUND((${cTot}${r}/${N})*100, 0)` }); rowData.push(tds[5 + N].innerText.replace(/[\n\r]/g, ' ').trim()); wsData.push(rowData); });
                 const ws = XLSX.utils.aoa_to_sheet(wsData); ws['!freeze'] = { xSplit: 2, ySplit: 1, topLeftCell: "C2", activePane: "bottomRight", state: "frozen" };
-                const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, `Rekap`); XLSX.writeFile(wb, `Tahfidz_${cls}.xlsx`);
+                const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, `Juz ${activeJuz}`); XLSX.writeFile(wb, `Tahfidz_${cls}_Juz${activeJuz}.xlsx`);
             } catch(e) {} hideLoader();
         }
 
@@ -2153,7 +2365,7 @@ body :is(input,select,textarea)::placeholder{color:#334155;opacity:.9}
             const pdfHeader = document.getElementById('tahfidz-pdf-header'), pdfFooter = document.getElementById('tahfidz-pdf-footer'), printContainer = document.getElementById('tahfidz-print-container');
             pdfHeader.classList.remove('hidden'); pdfHeader.classList.add('flex'); pdfFooter.classList.remove('hidden');
             const stickies = printContainer.querySelectorAll('.sticky'); stickies.forEach(el => { el.style.position = 'static'; el.style.boxShadow = 'none'; });
-            const opt = { margin: 10, filename: `Tahfidz_${cls}.pdf`, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff' }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' } };
+            const opt = { margin: 10, filename: `Tahfidz_${cls}_Juz${activeJuz}.pdf`, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff' }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' } };
             Swal.fire({ title: 'Menyiapkan A4...', text: 'Tunggu.', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
             html2pdf().set(opt).from(printContainer).save().then(() => {
                 pdfHeader.classList.add('hidden'); pdfHeader.classList.remove('flex'); pdfFooter.classList.add('hidden'); stickies.forEach(el => { el.style.position = 'sticky'; el.style.boxShadow = ''; }); Swal.close(); toast.fire({icon:'success', title:'Diunduh!'});
@@ -2179,7 +2391,7 @@ body :is(input,select,textarea)::placeholder{color:#334155;opacity:.9}
             if (type === 'Siswa') return { title: 'Data Siswa', head: ['No', 'Nama Siswa', 'Kelas', 'Jenis Kelamin'], rows: siswa.map((s, i) => [i + 1, s.Nama, s.Kelas, s.JenisKelamin === 'L' ? 'Laki-laki' : 'Perempuan']) };
             if (type === 'Jurnal') { const d = (await server.run('readData', 'Jurnal')).filter(x => allowed.includes(x.Kelas)).sort((a, b) => String(a.Tanggal).localeCompare(String(b.Tanggal))); return { title: 'Jurnal Mengajar', head: ['No', 'Tanggal', 'Kelas', 'Mapel', 'Materi', 'Hadir', 'Ketercapaian (%)', 'Catatan', 'Guru'], rows: d.map((x, i) => [i + 1, x.Tanggal, x.Kelas, x.Mapel, x.Materi, x.JmlHadir, x.Ketercapaian, x.Catatan, x.Guru || '-']) }; }
             const d = (await server.run('readData', 'CatatanKasus')).filter(x => by[x.NISSiswa]).sort((a, b) => String(a.Tanggal).localeCompare(String(b.Tanggal)));
-            return { title: 'Laporan Kasus', head: ['No', 'Tanggal', 'Siswa', 'Kelas', 'Pelapor', 'Uraian Kasus', 'Status'], rows: d.map((x, i) => [i + 1, x.Tanggal, by[x.NISSiswa].Nama, by[x.NISSiswa].Kelas, x.Pelapor, x.Uraian, x.Status]) };
+            return { title: 'Laporan Kasus', head: ['No', 'Tanggal', 'Siswa', 'Kelas', 'Pelapor', 'Uraian Kasus', 'Poin Pelanggaran', 'Status'], rows: d.map((x, i) => [i + 1, x.Tanggal, by[x.NISSiswa].Nama, by[x.NISSiswa].Kelas, x.Pelapor, x.Uraian, parseInt(x.PoinPelanggaran) || 0, x.Status]) };
         }
         async function promptExport(moduleType, format) {
             const r = await Swal.fire({ title: `Unduh ${EXPORT_LABEL[moduleType] || moduleType} (${format === 'excel' ? 'Excel' : 'PDF'})?`, showCancelButton: true, confirmButtonText: 'Ya, unduh', cancelButtonText: 'Batal' });
